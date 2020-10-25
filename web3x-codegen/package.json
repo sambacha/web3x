@@ -1,15 +1,15 @@
 {
-  "name": "web3x-codegen",
-  "version": "4.0.6",
+  "name": "web3x-codegen-ts",
+  "version": "4.1.0",
   "license": "MIT",
   "description": "Contract interface code generator for web3x.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/xf00f/web3x.git"
+    "url": "https://github.com/sambacha/web3x.git"
   },
-  "homepage": "https://github.com/xf00f/web3x",
+  "homepage": "https://github.com/sambacha/web3x",
   "bugs": {
-    "url": "https://github.com/xf00f/web3x/issues"
+    "url": "https://github.com/sambacha/web3x/issues"
   },
   "keywords": [
     "ethereum",
