@@ -25,10 +25,16 @@ import { Tx } from './tx';
 describe('eth', () => {
   describe('contract', () => {
     describe('tx', () => {
-      const contractAddress = Address.fromString('0x11f4d0A3c12e86B4b5F39B213F7E19D048276DAe');
+      const contractAddress = Address.fromString(
+        '0x11f4d0A3c12e86B4b5F39B213F7E19D048276DAe',
+      );
       const contractAddressLowercase = contractAddress.toString().toLowerCase();
-      const contractAddressUnprefixedLowercase = contractAddressLowercase.slice(2);
-      const from = Address.fromString('0x5555567890123456789012345678901234567891');
+      const contractAddressUnprefixedLowercase = contractAddressLowercase.slice(
+        2,
+      );
+      const from = Address.fromString(
+        '0x5555567890123456789012345678901234567891',
+      );
       const fromAddressLowercase = from.toString().toLowerCase();
       let mockEthereumProvider: MockEthereumProvider;
 
@@ -58,43 +64,57 @@ describe('eth', () => {
         ]);
         const methodAbi = contractAbi.functions[0];
 
-        mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-          expect(method).toBe('eth_sendTransaction');
-          expect(params).toEqual([
-            {
-              data:
-                signature +
-                '000000000000000000000000' +
-                contractAddressUnprefixedLowercase +
-                '000000000000000000000000000000000000000000000000000000000000000a',
-              from: fromAddressLowercase,
-              to: contractAddressLowercase,
-              gasPrice: '0x5af3107a4000',
-            },
-          ]);
-          return '0x1234000000000000000000000000000000000000000000000000000000056789';
-        });
+        mockEthereumProvider.send.mockImplementationOnce(
+          async (method, params) => {
+            expect(method).toBe('eth_sendTransaction');
+            expect(params).toEqual([
+              {
+                data:
+                  signature +
+                  '000000000000000000000000' +
+                  contractAddressUnprefixedLowercase +
+                  '000000000000000000000000000000000000000000000000000000000000000a',
+                from: fromAddressLowercase,
+                to: contractAddressLowercase,
+                gasPrice: '0x5af3107a4000',
+              },
+            ]);
+            return '0x1234000000000000000000000000000000000000000000000000000000056789';
+          },
+        );
 
-        mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-          expect(method).toBe('eth_getTransactionReceipt');
-          expect(params).toEqual(['0x1234000000000000000000000000000000000000000000000000000000056789']);
-          return {
-            from: fromAddressLowercase,
-            contractAddress: contractAddressLowercase,
-            cumulativeGasUsed: '0xa',
-            transactionIndex: '0x3',
-            blockNumber: '0xa',
-            blockHash: '0xbf1234',
-            gasUsed: '0x0',
-          };
-        });
+        mockEthereumProvider.send.mockImplementationOnce(
+          async (method, params) => {
+            expect(method).toBe('eth_getTransactionReceipt');
+            expect(params).toEqual([
+              '0x1234000000000000000000000000000000000000000000000000000000056789',
+            ]);
+            return {
+              from: fromAddressLowercase,
+              contractAddress: contractAddressLowercase,
+              cumulativeGasUsed: '0xa',
+              transactionIndex: '0x3',
+              blockNumber: '0xa',
+              blockHash: '0xbf1234',
+              gasUsed: '0x0',
+            };
+          },
+        );
 
         const args = [contractAddress, 10];
-        const tx = new Tx(new Eth(mockEthereumProvider), methodAbi, contractAbi, contractAddress, args);
+        const tx = new Tx(
+          new Eth(mockEthereumProvider),
+          methodAbi,
+          contractAbi,
+          contractAddress,
+          args,
+        );
 
         const txSend = tx.send({ from, gasPrice: '100000000000000' });
 
-        expect(await txSend.getTxHash()).toBe('0x1234000000000000000000000000000000000000000000000000000000056789');
+        expect(await txSend.getTxHash()).toBe(
+          '0x1234000000000000000000000000000000000000000000000000000000056789',
+        );
         expect(await txSend.getReceipt()).toEqual({
           from,
           contractAddress,
@@ -130,21 +150,32 @@ describe('eth', () => {
         ]);
         const methodAbi = contractAbi.functions[0];
 
-        mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-          expect(method).toBe('eth_call');
-          expect(params).toEqual([
-            {
-              data: signature + '000000000000000000000000' + contractAddressUnprefixedLowercase,
-              from: from.toString().toLowerCase(),
-              to: contractAddressLowercase,
-            },
-            'latest',
-          ]);
-          return '0x000000000000000000000000000000000000000000000000000000000000000a';
-        });
+        mockEthereumProvider.send.mockImplementationOnce(
+          async (method, params) => {
+            expect(method).toBe('eth_call');
+            expect(params).toEqual([
+              {
+                data:
+                  signature +
+                  '000000000000000000000000' +
+                  contractAddressUnprefixedLowercase,
+                from: from.toString().toLowerCase(),
+                to: contractAddressLowercase,
+              },
+              'latest',
+            ]);
+            return '0x000000000000000000000000000000000000000000000000000000000000000a';
+          },
+        );
 
         const args = [contractAddress];
-        const tx = new Tx(new Eth(mockEthereumProvider), methodAbi, contractAbi, contractAddress, args);
+        const tx = new Tx(
+          new Eth(mockEthereumProvider),
+          methodAbi,
+          contractAbi,
+          contractAddress,
+          args,
+        );
 
         const result = await tx.call({ from });
         expect(result).toBe('10');

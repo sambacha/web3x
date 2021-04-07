@@ -16,7 +16,12 @@
 */
 
 import { Address } from '../address';
-import { bufferToHex, hexToBuffer, hexToNumberString, numberToHex } from '../utils';
+import {
+  bufferToHex,
+  hexToBuffer,
+  hexToNumberString,
+  numberToHex,
+} from '../utils';
 
 export interface EstimateRequest {
   from?: Address;
@@ -48,7 +53,9 @@ export function toRawEstimateRequest(tx: EstimateRequest): RawEstimateRequest {
   };
 }
 
-export function fromRawEstimateRequest(tx: RawEstimateRequest): EstimateRequest {
+export function fromRawEstimateRequest(
+  tx: RawEstimateRequest,
+): EstimateRequest {
   const { from, to, gas, gasPrice, value, data } = tx;
   return {
     from: from ? Address.fromString(from) : undefined,

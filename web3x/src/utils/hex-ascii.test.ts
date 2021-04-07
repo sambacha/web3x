@@ -30,7 +30,7 @@ describe('utils', () => {
       },
     ];
 
-    tests.forEach(test => {
+    tests.forEach((test) => {
       it('should turn ' + test.value + ' to ' + test.expected, () => {
         expect(asciiToHex(test.value)).toBe(test.expected);
       });
@@ -49,7 +49,7 @@ describe('utils', () => {
       },
     ];
 
-    tests.forEach(test => {
+    tests.forEach((test) => {
       it('should turn ' + test.value + ' to ' + test.expected, () => {
         expect(hexToAscii(test.value)).toBe(test.expected);
       });

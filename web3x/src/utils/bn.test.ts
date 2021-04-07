@@ -40,20 +40,28 @@ describe('utils', () => {
       { value: '-0xf', expected: '-15' },
       { value: '-0x0f', expected: '-15' },
       {
-        value: '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
-        expected: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+        value:
+          '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+        expected:
+          '115792089237316195423570985008687907853269984665640564039457584007913129639935',
       },
       {
-        value: '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd',
-        expected: '115792089237316195423570985008687907853269984665640564039457584007913129639933',
+        value:
+          '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd',
+        expected:
+          '115792089237316195423570985008687907853269984665640564039457584007913129639933',
       },
       {
-        value: '-0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
-        expected: '-115792089237316195423570985008687907853269984665640564039457584007913129639935',
+        value:
+          '-0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+        expected:
+          '-115792089237316195423570985008687907853269984665640564039457584007913129639935',
       },
       {
-        value: '-0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd',
-        expected: '-115792089237316195423570985008687907853269984665640564039457584007913129639933',
+        value:
+          '-0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd',
+        expected:
+          '-115792089237316195423570985008687907853269984665640564039457584007913129639933',
       },
       { value: 0, expected: '0' },
       { value: '0', expected: '0' },
@@ -64,7 +72,7 @@ describe('utils', () => {
       { value: new BN(0), expected: '0' },
     ];
 
-    tests.forEach(test => {
+    tests.forEach((test) => {
       it('should turn ' + test.value + ' to ' + test.expected, () => {
         expect(toBN(test.value).toString(10)).toBe(test.expected);
       });
@@ -84,7 +92,7 @@ describe('utils', () => {
         { value: '0x12', is: false },
       ];
 
-      tests.forEach(test => {
+      tests.forEach((test) => {
         it('shoud test if value is BN: ' + test.is, () => {
           expect(isBN(test.value)).toBe(test.is);
         });
@@ -101,35 +109,50 @@ describe('utils', () => {
       { value: '0xf', expected: leftPad(new BN(15).toString(16), 64) },
       {
         value: -1,
-        expected: new BN('ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 16)
+        expected: new BN(
+          'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+          16,
+        )
           .add(new BN(-1))
           .addn(1)
           .toString(16),
       },
       {
         value: '-1',
-        expected: new BN('ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 16)
+        expected: new BN(
+          'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+          16,
+        )
           .add(new BN(-1))
           .addn(1)
           .toString(16),
       },
       {
         value: '-0x1',
-        expected: new BN('ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 16)
+        expected: new BN(
+          'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+          16,
+        )
           .add(new BN(-1))
           .addn(1)
           .toString(16),
       },
       {
         value: '-15',
-        expected: new BN('ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 16)
+        expected: new BN(
+          'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+          16,
+        )
           .add(new BN(-15))
           .addn(1)
           .toString(16),
       },
       {
         value: '-0xf',
-        expected: new BN('ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 16)
+        expected: new BN(
+          'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+          16,
+        )
           .add(new BN(-15))
           .addn(1)
           .toString(16),
@@ -143,9 +166,11 @@ describe('utils', () => {
       { value: new BN(15), expected: leftPad(new BN(15).toString(16), 64) },
     ];
 
-    tests.forEach(test => {
+    tests.forEach((test) => {
       it('printing ' + test.value, () => {
-        expect(toTwosComplement(test.value).replace('0x', '')).toBe(test.expected);
+        expect(toTwosComplement(test.value).replace('0x', '')).toBe(
+          test.expected,
+        );
       });
     });
   });

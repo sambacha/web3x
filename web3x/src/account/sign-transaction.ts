@@ -23,7 +23,13 @@ import Bytes from '../eth-lib/bytes';
 import Nat from '../eth-lib/nat';
 import RLP from '../eth-lib/rlp';
 import { inputAddressFormatter } from '../formatters';
-import { bufferToHex, makeHexEven, numberToHex, sha3, trimHexLeadingZero } from '../utils';
+import {
+  bufferToHex,
+  makeHexEven,
+  numberToHex,
+  sha3,
+  trimHexLeadingZero,
+} from '../utils';
 
 export interface SignTransactionRequest {
   chainId?: number | string;
@@ -46,13 +52,21 @@ export interface SignedTx {
   nonce?: number;
 }
 
-export async function signTransaction(tx: SignTransactionRequest, privateKey: Buffer, eth: Eth): Promise<SignedTx> {
+export async function signTransaction(
+  tx: SignTransactionRequest,
+  privateKey: Buffer,
+  eth: Eth,
+): Promise<SignedTx> {
   if (!tx.gas) {
     throw new Error('gas is missing or 0');
   }
 
   // Resolve immediately if nonce, chainId and price are provided
-  if (tx.nonce !== undefined && tx.chainId !== undefined && tx.gasPrice !== undefined) {
+  if (
+    tx.nonce !== undefined &&
+    tx.chainId !== undefined &&
+    tx.gasPrice !== undefined
+  ) {
     return sign(tx, privateKey);
   }
 
@@ -61,14 +75,18 @@ export async function signTransaction(tx: SignTransactionRequest, privateKey: Bu
     isNot(tx.chainId) ? eth.getId() : Promise.resolve(tx.chainId),
     isNot(tx.gasPrice) ? eth.getGasPrice() : Promise.resolve(tx.gasPrice),
     isNot(tx.nonce)
-      ? eth.getTransactionCount(Address.fromString(Account.fromPrivate(privateKey).address))
+      ? eth.getTransactionCount(
+          Address.fromString(Account.fromPrivate(privateKey).address),
+        )
       : Promise.resolve(tx.nonce),
   ];
 
   const [chainId, gasPrice, nonce] = await Promise.all(promises);
 
   if (isNot(chainId) || isNot(gasPrice) || isNot(nonce)) {
-    throw new Error('One of the values chainId, gasPrice, or nonce could not be fetched');
+    throw new Error(
+      'One of the values chainId, gasPrice, or nonce could not be fetched',
+    );
   }
 
   return sign({ ...tx, chainId, gasPrice, nonce }, privateKey);
@@ -78,7 +96,8 @@ export function recoverTransaction(rawTx: string): string {
   const values = RLP.decode(rawTx);
   const signature = Account.encodeSignature(values.slice(6, 9));
   const recovery = Bytes.toNumber(values[6]);
-  const extraData = recovery < 35 ? [] : [Bytes.fromNumber((recovery - 35) >> 1), '0x', '0x'];
+  const extraData =
+    recovery < 35 ? [] : [Bytes.fromNumber((recovery - 35) >> 1), '0x', '0x'];
   const signingData = values.slice(0, 6).concat(extraData);
   const signingDataHex = RLP.encode(signingData);
   return Account.recover(sha3(signingDataHex), signature);
@@ -107,9 +126,15 @@ export function sign(tx: SignTransactionRequest, privateKey: Buffer): SignedTx {
 
   const messageHash = sha3(rlpEncoded);
 
-  const signature = Account.makeSigner(Nat.toNumber(chainId || '0x1') * 2 + 35)(messageHash, privateKey);
+  const signature = Account.makeSigner(Nat.toNumber(chainId || '0x1') * 2 + 35)(
+    messageHash,
+    privateKey,
+  );
 
-  const rawTx: any[] = [...decode(rlpEncoded).slice(0, 6), ...Account.decodeSignature(signature)];
+  const rawTx: any[] = [
+    ...decode(rlpEncoded).slice(0, 6),
+    ...Account.decodeSignature(signature),
+  ];
 
   rawTx[6] = makeHexEven(trimHexLeadingZero(rawTx[6]));
   rawTx[7] = makeHexEven(trimHexLeadingZero(rawTx[7]));

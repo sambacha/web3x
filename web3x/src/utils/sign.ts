@@ -16,7 +16,12 @@
 */
 
 import { Address } from '../address';
-import { decodeSignature, encodeSignature, recover as ethLibRecover, sign as ethLibSign } from '../eth-lib/account';
+import {
+  decodeSignature,
+  encodeSignature,
+  recover as ethLibRecover,
+  sign as ethLibSign,
+} from '../eth-lib/account';
 import { hashMessage } from './hash-message';
 
 export interface Signature {
@@ -47,14 +52,24 @@ export function recoverFromSignature(signature: Signature) {
   return recoverFromSigString(messageHash, encodeSignature([v, r, s]), true);
 }
 
-export function recoverFromVRS(message: string, v: string, r: string, s: string, prefixed: boolean = false) {
+export function recoverFromVRS(
+  message: string,
+  v: string,
+  r: string,
+  s: string,
+  prefixed: boolean = false,
+) {
   if (!prefixed) {
     message = hashMessage(message);
   }
   return recoverFromSigString(message, encodeSignature([v, r, s]), true);
 }
 
-export function recoverFromSigString(message: string, signature: string, preFixed: boolean = false) {
+export function recoverFromSigString(
+  message: string,
+  signature: string,
+  preFixed: boolean = false,
+) {
   if (!preFixed) {
     message = hashMessage(message);
   }
@@ -63,8 +78,18 @@ export function recoverFromSigString(message: string, signature: string, preFixe
 }
 
 export function recover(signature: Signature): Address;
-export function recover(message: string, v: string, r: string, s: string, prefixed?: boolean): Address;
-export function recover(message: string, signature: string, preFixed?: boolean): Address;
+export function recover(
+  message: string,
+  v: string,
+  r: string,
+  s: string,
+  prefixed?: boolean,
+): Address;
+export function recover(
+  message: string,
+  signature: string,
+  preFixed?: boolean,
+): Address;
 export function recover(...args: any[]): Address {
   switch (args.length) {
     case 1:

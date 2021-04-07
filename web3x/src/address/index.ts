@@ -5,7 +5,11 @@ export class Address {
 
   constructor(private buffer: Buffer) {
     if (buffer.length === 32) {
-      if (!buffer.slice(0, 12).equals(Buffer.of(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))) {
+      if (
+        !buffer
+          .slice(0, 12)
+          .equals(Buffer.of(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+      ) {
         throw new Error('Invalid address buffer.');
       } else {
         this.buffer = buffer.slice(12);
@@ -26,7 +30,10 @@ export class Address {
     if (!/^(0x)?[0-9a-f]{40}$/i.test(address)) {
       // Does not have the basic requirements of an address.
       return false;
-    } else if (/^(0x|0X)?[0-9a-f]{40}$/.test(address) || /^(0x|0X)?[0-9A-F]{40}$/.test(address)) {
+    } else if (
+      /^(0x|0X)?[0-9a-f]{40}$/.test(address) ||
+      /^(0x|0X)?[0-9A-F]{40}$/.test(address)
+    ) {
       // It's ALL lowercase or ALL upppercase.
       return true;
     } else {
@@ -41,8 +48,10 @@ export class Address {
     for (let i = 0; i < 40; i++) {
       // The nth letter should be uppercase if the nth digit of casemap is 1.
       if (
-        (parseInt(addressHash[i], 16) > 7 && address[i].toUpperCase() !== address[i]) ||
-        (parseInt(addressHash[i], 16) <= 7 && address[i].toLowerCase() !== address[i])
+        (parseInt(addressHash[i], 16) > 7 &&
+          address[i].toUpperCase() !== address[i]) ||
+        (parseInt(addressHash[i], 16) <= 7 &&
+          address[i].toLowerCase() !== address[i])
       ) {
         return false;
       }

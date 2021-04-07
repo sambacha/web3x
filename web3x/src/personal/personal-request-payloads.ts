@@ -16,7 +16,11 @@
 */
 
 import { Address } from '../address';
-import { inputSignFormatter, toRawTransactionRequest, TransactionRequest } from '../formatters';
+import {
+  inputSignFormatter,
+  toRawTransactionRequest,
+  TransactionRequest,
+} from '../formatters';
 import { bufferToHex } from '../utils';
 
 export interface Transaction extends TransactionRequest {
@@ -73,7 +77,10 @@ export class PersonalRequestPayloads {
   public sendTransaction(tx: Transaction, password: string) {
     return {
       method: 'personal_sendTransaction',
-      params: [{ ...toRawTransactionRequest(tx), condition: tx.condition }, password],
+      params: [
+        { ...toRawTransactionRequest(tx), condition: tx.condition },
+        password,
+      ],
       format: identity<string>(),
     };
   }
@@ -81,7 +88,10 @@ export class PersonalRequestPayloads {
   public signTransaction(tx: Transaction, password: string) {
     return {
       method: 'personal_signTransaction',
-      params: [{ ...toRawTransactionRequest(tx), condition: tx.condition }, password],
+      params: [
+        { ...toRawTransactionRequest(tx), condition: tx.condition },
+        password,
+      ],
       format: identity<SignedTransaction>(),
     };
   }
@@ -89,7 +99,11 @@ export class PersonalRequestPayloads {
   public sign(message: string, address: Address, password: string) {
     return {
       method: 'personal_sign',
-      params: [inputSignFormatter(message), address.toString().toLowerCase(), password],
+      params: [
+        inputSignFormatter(message),
+        address.toString().toLowerCase(),
+        password,
+      ],
       format: identity<string>(),
     };
   }

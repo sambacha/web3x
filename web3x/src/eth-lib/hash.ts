@@ -81,7 +81,7 @@ const RC = [
   2147483648,
 ];
 
-const Keccak = bits => ({
+const Keccak = (bits) => ({
   blocks: [],
   reset: true,
   block: 0,
@@ -131,7 +131,9 @@ const update = (state, message) => {
           blocks[i >> 2] |= (0x80 | ((code >> 6) & 0x3f)) << SHIFT[i++ & 3];
           blocks[i >> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
         } else {
-          code = 0x10000 + (((code & 0x3ff) << 10) | (message.charCodeAt(++index) & 0x3ff));
+          code =
+            0x10000 +
+            (((code & 0x3ff) << 10) | (message.charCodeAt(++index) & 0x3ff));
           blocks[i >> 2] |= (0xf0 | (code >> 18)) << SHIFT[i++ & 3];
           blocks[i >> 2] |= (0x80 | ((code >> 12) & 0x3f)) << SHIFT[i++ & 3];
           blocks[i >> 2] |= (0x80 | ((code >> 6) & 0x3f)) << SHIFT[i++ & 3];
@@ -194,7 +196,7 @@ const update = (state, message) => {
   return '0x' + hex;
 };
 
-const f = s => {
+const f = (s) => {
   var h,
     l,
     n,
@@ -439,11 +441,12 @@ const f = s => {
   }
 };
 
-const keccak = bits => str => {
+const keccak = (bits) => (str) => {
   var msg;
   if (str.slice(0, 2) === '0x') {
     msg = [];
-    for (var i = 2, l = str.length; i < l; i += 2) msg.push(parseInt(str.slice(i, i + 2), 16));
+    for (var i = 2, l = str.length; i < l; i += 2)
+      msg.push(parseInt(str.slice(i, i + 2), 16));
   } else {
     msg = str;
   }

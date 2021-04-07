@@ -26,17 +26,27 @@ describe('account', () => {
   });
 
   it('should create account from private key', () => {
-    const privateKey = Buffer.from('7a28b5ba57c53603b0b07b56bba752f7784bf506fa95edc395f5cf6c7514fe9d', 'hex');
+    const privateKey = Buffer.from(
+      '7a28b5ba57c53603b0b07b56bba752f7784bf506fa95edc395f5cf6c7514fe9d',
+      'hex',
+    );
     const account = Account.fromPrivate(privateKey);
-    expect(account.address.toString()).toBe('0x008AeEda4D805471dF9b2A5B0f38A0C3bCBA786b');
+    expect(account.address.toString()).toBe(
+      '0x008AeEda4D805471dF9b2A5B0f38A0C3bCBA786b',
+    );
   });
 
   it('should create account from mnemonic and path', () => {
-    const mnemonic = 'uncover parade truck rhythm cinnamon cattle polar luxury chest anchor cinnamon coil';
+    const mnemonic =
+      'uncover parade truck rhythm cinnamon cattle polar luxury chest anchor cinnamon coil';
     const path = "m/44'/60'/0'/0/0";
     const account = Account.createFromMnemonicAndPath(mnemonic, path);
-    expect(account.address.toString()).toBe('0xb897DF5d6c6D5b15E7340D7Ea2A8B8dC776B43F4');
-    expect(bufferToHex(account.privateKey)).toBe('0xdc21e91bcb468f2c2484f44f947f38625b441366f9afe82cda6f3d9de0135c3b');
+    expect(account.address.toString()).toBe(
+      '0xb897DF5d6c6D5b15E7340D7Ea2A8B8dC776B43F4',
+    );
+    expect(bufferToHex(account.privateKey)).toBe(
+      '0xdc21e91bcb468f2c2484f44f947f38625b441366f9afe82cda6f3d9de0135c3b',
+    );
   });
 
   it('should encrypt and decrypt account', async () => {
@@ -48,7 +58,10 @@ describe('account', () => {
   });
 
   it('should sign data', async () => {
-    const privateKey = Buffer.from('7a28b5ba57c53603b0b07b56bba752f7784bf506fa95edc395f5cf6c7514fe9d', 'hex');
+    const privateKey = Buffer.from(
+      '7a28b5ba57c53603b0b07b56bba752f7784bf506fa95edc395f5cf6c7514fe9d',
+      'hex',
+    );
     const account = Account.fromPrivate(privateKey);
     const signedData = account.sign('data to sign');
     const address = recover(signedData);
@@ -57,7 +70,9 @@ describe('account', () => {
 
   it('should sign transaction', async () => {
     const mockEthereum: any = undefined;
-    const privateKey = hexToBuffer('0x4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318');
+    const privateKey = hexToBuffer(
+      '0x4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318',
+    );
     const tx = {
       chainId: 1,
       nonce: 0,
@@ -114,6 +129,8 @@ describe('account', () => {
     };
     const testAccount = Account.create();
 
-    await expect(testAccount.sendTransaction(tx, mockEthereum as any).getReceipt()).rejects.toThrowError('gas');
+    await expect(
+      testAccount.sendTransaction(tx, mockEthereum as any).getReceipt(),
+    ).rejects.toThrowError('gas');
   });
 });

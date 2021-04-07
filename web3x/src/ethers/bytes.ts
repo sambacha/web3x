@@ -43,7 +43,11 @@ function addSlice(array: Uint8Array): Uint8Array {
 }
 
 export function isArrayish(value: any): value is Arrayish {
-  if (!value || parseInt(String(value.length)) != value.length || typeof value === 'string') {
+  if (
+    !value ||
+    parseInt(String(value.length)) != value.length ||
+    typeof value === 'string'
+  ) {
     return false;
   }
 
@@ -59,7 +63,11 @@ export function isArrayish(value: any): value is Arrayish {
 
 export function arrayify(value: Arrayish | Hexable): Uint8Array {
   if (value == null) {
-    errors.throwError('cannot convert null value to array', errors.INVALID_ARGUMENT, { arg: 'value', value: value });
+    errors.throwError(
+      'cannot convert null value to array',
+      errors.INVALID_ARGUMENT,
+      { arg: 'value', value: value },
+    );
   }
 
   if (isHexable(value)) {
@@ -70,14 +78,22 @@ export function arrayify(value: Arrayish | Hexable): Uint8Array {
     let match = value.match(/^(0x)?[0-9a-fA-F]*$/);
 
     if (!match) {
-      return errors.throwError('invalid hexidecimal string', errors.INVALID_ARGUMENT, { arg: 'value', value: value });
+      return errors.throwError(
+        'invalid hexidecimal string',
+        errors.INVALID_ARGUMENT,
+        { arg: 'value', value: value },
+      );
     }
 
     if (match[1] !== '0x') {
-      return errors.throwError('hex string must have 0x prefix', errors.INVALID_ARGUMENT, {
-        arg: 'value',
-        value: value,
-      });
+      return errors.throwError(
+        'hex string must have 0x prefix',
+        errors.INVALID_ARGUMENT,
+        {
+          arg: 'value',
+          value: value,
+        },
+      );
     }
 
     value = value.substring(2);
@@ -97,7 +113,11 @@ export function arrayify(value: Arrayish | Hexable): Uint8Array {
     return addSlice(new Uint8Array(value));
   }
 
-  return errors.throwError('invalid arrayify value', undefined, { arg: 'value', value: value, type: typeof value });
+  return errors.throwError('invalid arrayify value', undefined, {
+    arg: 'value',
+    value: value,
+    type: typeof value,
+  });
 }
 
 export function concat(objects: Array<Arrayish>): Uint8Array {
@@ -171,7 +191,11 @@ export function hexlify(value: Arrayish | Hexable | number): string {
 
   if (typeof value === 'number') {
     if (value < 0) {
-      errors.throwError('cannot hexlify negative value', errors.INVALID_ARGUMENT, { arg: 'value', value: value });
+      errors.throwError(
+        'cannot hexlify negative value',
+        errors.INVALID_ARGUMENT,
+        { arg: 'value', value: value },
+      );
     }
 
     var hex = '';
@@ -194,14 +218,22 @@ export function hexlify(value: Arrayish | Hexable | number): string {
     let match = value.match(/^(0x)?[0-9a-fA-F]*$/);
 
     if (!match) {
-      return errors.throwError('invalid hexidecimal string', errors.INVALID_ARGUMENT, { arg: 'value', value: value });
+      return errors.throwError(
+        'invalid hexidecimal string',
+        errors.INVALID_ARGUMENT,
+        { arg: 'value', value: value },
+      );
     }
 
     if (match[1] !== '0x') {
-      return errors.throwError('hex string must have 0x prefix', errors.INVALID_ARGUMENT, {
-        arg: 'value',
-        value: value,
-      });
+      return errors.throwError(
+        'hex string must have 0x prefix',
+        errors.INVALID_ARGUMENT,
+        {
+          arg: 'value',
+          value: value,
+        },
+      );
     }
 
     if (value.length % 2) {
@@ -219,7 +251,10 @@ export function hexlify(value: Arrayish | Hexable | number): string {
     return '0x' + result.join('');
   }
 
-  return errors.throwError('invalid hexlify value', undefined, { arg: 'value', value: value });
+  return errors.throwError('invalid hexlify value', undefined, {
+    arg: 'value',
+    value: value,
+  });
 }
 
 export function hexDataLength(data: string) {
@@ -229,12 +264,22 @@ export function hexDataLength(data: string) {
   return (data.length - 2) / 2;
 }
 
-export function hexDataSlice(data: string, offset: number, endOffset?: number): string {
+export function hexDataSlice(
+  data: string,
+  offset: number,
+  endOffset?: number,
+): string {
   if (!isHexString(data)) {
-    errors.throwError('invalid hex data', errors.INVALID_ARGUMENT, { arg: 'value', value: data });
+    errors.throwError('invalid hex data', errors.INVALID_ARGUMENT, {
+      arg: 'value',
+      value: data,
+    });
   }
   if (data.length % 2 !== 0) {
-    errors.throwError('hex data length must be even', errors.INVALID_ARGUMENT, { arg: 'value', value: data });
+    errors.throwError('hex data length must be even', errors.INVALID_ARGUMENT, {
+      arg: 'value',
+      value: data,
+    });
   }
   offset = 2 + 2 * offset;
 
@@ -247,7 +292,10 @@ export function hexDataSlice(data: string, offset: number, endOffset?: number): 
 
 export function hexStripZeros(value: string): string {
   if (!isHexString(value)) {
-    errors.throwError('invalid hex string', errors.INVALID_ARGUMENT, { arg: 'value', value: value });
+    errors.throwError('invalid hex string', errors.INVALID_ARGUMENT, {
+      arg: 'value',
+      value: value,
+    });
   }
   while (value.length > 3 && value.substring(0, 3) === '0x0') {
     value = '0x' + value.substring(3);
@@ -257,7 +305,10 @@ export function hexStripZeros(value: string): string {
 
 export function hexZeroPad(value: string, length: number): string {
   if (!isHexString(value)) {
-    errors.throwError('invalid hex string', errors.INVALID_ARGUMENT, { arg: 'value', value: value });
+    errors.throwError('invalid hex string', errors.INVALID_ARGUMENT, {
+      arg: 'value',
+      value: value,
+    });
   }
 
   while (value.length < 2 * length + 2) {
@@ -277,10 +328,14 @@ export function splitSignature(signature: Arrayish | Signature): Signature {
 
   if (isSignature(signature)) {
     if (signature.v == null && signature.recoveryParam == null) {
-      errors.throwError('at least on of recoveryParam or v must be specified', errors.INVALID_ARGUMENT, {
-        argument: 'signature',
-        value: signature,
-      });
+      errors.throwError(
+        'at least on of recoveryParam or v must be specified',
+        errors.INVALID_ARGUMENT,
+        {
+          argument: 'signature',
+          value: signature,
+        },
+      );
     }
     r = hexZeroPad(signature.r, 32);
     s = hexZeroPad(signature.s, 32);
@@ -320,5 +375,11 @@ export function splitSignature(signature: Arrayish | Signature): Signature {
 export function joinSignature(signature: Signature): string {
   signature = splitSignature(signature);
 
-  return hexlify(concat([signature.r, signature.s, signature.recoveryParam ? '0x1c' : '0x1b']));
+  return hexlify(
+    concat([
+      signature.r,
+      signature.s,
+      signature.recoveryParam ? '0x1c' : '0x1b',
+    ]),
+  );
 }

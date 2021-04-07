@@ -53,11 +53,15 @@ export interface TransactionResponse {
   s: string;
 }
 
-export function fromRawTransactionResponse(tx: RawTransactionResponse): TransactionResponse {
+export function fromRawTransactionResponse(
+  tx: RawTransactionResponse,
+): TransactionResponse {
   return {
     ...tx,
     blockNumber: tx.blockNumber ? hexToNumber(tx.blockNumber) : null,
-    transactionIndex: tx.transactionIndex ? hexToNumber(tx.transactionIndex) : null,
+    transactionIndex: tx.transactionIndex
+      ? hexToNumber(tx.transactionIndex)
+      : null,
     nonce: hexToNumber(tx.nonce),
     gas: hexToNumber(tx.gas),
     gasPrice: outputBigNumberFormatter(tx.gasPrice),
@@ -67,11 +71,15 @@ export function fromRawTransactionResponse(tx: RawTransactionResponse): Transact
   };
 }
 
-export function toRawTransactionResponse(tx: TransactionResponse): RawTransactionResponse {
+export function toRawTransactionResponse(
+  tx: TransactionResponse,
+): RawTransactionResponse {
   return {
     ...tx,
     blockNumber: tx.blockNumber ? numberToHex(tx.blockNumber) : null,
-    transactionIndex: tx.transactionIndex ? numberToHex(tx.transactionIndex) : null,
+    transactionIndex: tx.transactionIndex
+      ? numberToHex(tx.transactionIndex)
+      : null,
     nonce: numberToHex(tx.nonce)!,
     gas: numberToHex(tx.gas)!,
     gasPrice: numberToHex(tx.gasPrice),

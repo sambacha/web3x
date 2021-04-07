@@ -29,17 +29,25 @@ export class TxDeploy extends Tx {
     private deployData: Buffer,
     args: any[] = [],
     defaultOptions: DefaultOptions = {},
-    private onDeployed: (address: Address) => void = x => x,
+    private onDeployed: (address: Address) => void = (x) => x,
   ) {
     super(eth, contractEntry, contractAbi, undefined, args, defaultOptions);
   }
 
   public send(options: SendOptions): SendTx {
     const sentTx = super.send(options);
-    return new SentDeployContractTx(this.eth, this.contractAbi, sentTx.getTxHash(), this.onDeployed);
+    return new SentDeployContractTx(
+      this.eth,
+      this.contractAbi,
+      sentTx.getTxHash(),
+      this.onDeployed,
+    );
   }
 
   public encodeABI() {
-    return Buffer.concat([this.deployData, this.contractEntry.encodeParameters(this.args)]);
+    return Buffer.concat([
+      this.deployData,
+      this.contractEntry.encodeParameters(this.args),
+    ]);
   }
 }

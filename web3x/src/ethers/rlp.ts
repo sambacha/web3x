@@ -14,7 +14,11 @@ function arrayifyInteger(value: number): Array<number> {
   return result;
 }
 
-function unarrayifyInteger(data: Uint8Array, offset: number, length: number): number {
+function unarrayifyInteger(
+  data: Uint8Array,
+  offset: number,
+  length: number,
+): number {
   var result = 0;
   for (var i = 0; i < length; i++) {
     result = result * 256 + data[offset + i];
@@ -64,7 +68,12 @@ type Decoded = {
   consumed: number;
 };
 
-function _decodeChildren(data: Uint8Array, offset: number, childOffset: number, length: number): Decoded {
+function _decodeChildren(
+  data: Uint8Array,
+  offset: number,
+  childOffset: number,
+  length: number,
+): Decoded {
   var result: any[] = [];
 
   while (childOffset < offset + 1 + length) {
@@ -82,7 +91,10 @@ function _decodeChildren(data: Uint8Array, offset: number, childOffset: number, 
 }
 
 // returns { consumed: number, result: Object }
-function _decode(data: Uint8Array, offset: number): { consumed: number; result: any } {
+function _decode(
+  data: Uint8Array,
+  offset: number,
+): { consumed: number; result: any } {
   if (data.length === 0) {
     throw new Error('invalid rlp data');
   }
@@ -99,7 +111,12 @@ function _decode(data: Uint8Array, offset: number): { consumed: number; result: 
       throw new Error('to short');
     }
 
-    return _decodeChildren(data, offset, offset + 1 + lengthLength, lengthLength + length);
+    return _decodeChildren(
+      data,
+      offset,
+      offset + 1 + lengthLength,
+      lengthLength + length,
+    );
   } else if (data[offset] >= 0xc0) {
     var length = data[offset] - 0xc0;
     if (offset + 1 + length > data.length) {
@@ -118,7 +135,9 @@ function _decode(data: Uint8Array, offset: number): { consumed: number; result: 
       throw new Error('invalid rlp data');
     }
 
-    var result = hexlify(data.slice(offset + 1 + lengthLength, offset + 1 + lengthLength + length));
+    var result = hexlify(
+      data.slice(offset + 1 + lengthLength, offset + 1 + lengthLength + length),
+    );
     return { consumed: 1 + lengthLength + length, result: result };
   } else if (data[offset] >= 0x80) {
     var length = data[offset] - 0x80;

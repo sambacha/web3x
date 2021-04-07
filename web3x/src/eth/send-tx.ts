@@ -31,7 +31,10 @@ export class SentTransaction implements SendTx {
   private receipt?: TransactionReceipt | null;
   private blocksSinceSent = 0;
 
-  constructor(protected eth: Eth, protected txHashPromise: Promise<TransactionHash>) {}
+  constructor(
+    protected eth: Eth,
+    protected txHashPromise: Promise<TransactionHash>,
+  ) {}
 
   public async getTxHash(): Promise<TransactionHash> {
     return this.txHashPromise;
@@ -82,7 +85,8 @@ export class SentTransaction implements SendTx {
                 return;
               }
 
-              const confirmations = 1 + blockHeader.number! - this.receipt.blockNumber;
+              const confirmations =
+                1 + blockHeader.number! - this.receipt.blockNumber;
 
               if (confirmationCallback) {
                 confirmationCallback(confirmations, this.receipt);

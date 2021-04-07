@@ -40,11 +40,16 @@ export function isHex(hex: string) {
 /**
  * Auto converts any given value into it's hex representation.
  */
-export function toHex(value: string | number | BN | boolean | object, returnType?: any) {
+export function toHex(
+  value: string | number | BN | boolean | object,
+  returnType?: any,
+) {
   /*jshint maxcomplexity: false */
 
   if (isString(value) && Address.isAddress(value)) {
-    return returnType ? 'address' : '0x' + (value as string).toLowerCase().replace(/^0x/i, '');
+    return returnType
+      ? 'address'
+      : '0x' + (value as string).toLowerCase().replace(/^0x/i, '');
   }
 
   if (isBoolean(value)) {
@@ -66,7 +71,11 @@ export function toHex(value: string | number | BN | boolean | object, returnType
     }
   }
 
-  return returnType ? (value < 0 ? 'int256' : 'uint256') : numberToHex(value as number);
+  return returnType
+    ? value < 0
+      ? 'int256'
+      : 'uint256'
+    : numberToHex(value as number);
 }
 
 export function randomHex(size): string {

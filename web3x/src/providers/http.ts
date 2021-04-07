@@ -49,8 +49,8 @@ class LegacyHttpProvider implements LegacyProvider {
       },
       body: JSON.stringify(payload),
     })
-      .then(response => response.json())
-      .then(json => callback(undefined, json))
+      .then((response) => response.json())
+      .then((json) => callback(undefined, json))
       .catch(callback);
   }
 

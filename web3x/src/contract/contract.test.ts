@@ -25,27 +25,38 @@ import { TestContract, TestContractAbi } from './fixtures/TestContract';
 import { TestNoCtorContract } from './fixtures/TestNoCtorContract';
 
 describe('contract', () => {
-  const address = Address.fromString('0x11f4d0A3c12e86B4b5F39B213F7E19D048276DAe');
+  const address = Address.fromString(
+    '0x11f4d0A3c12e86B4b5F39B213F7E19D048276DAe',
+  );
   const addressLowercase = address.toString().toLowerCase();
   const addressUnprefixedLowercase = addressLowercase.slice(2);
-  const address2 = Address.fromString('0x5555567890123456789012345678901234567891');
+  const address2 = Address.fromString(
+    '0x5555567890123456789012345678901234567891',
+  );
   const address2Lowercase = address2.toString().toLowerCase();
   const blockHeader = {
     hash: '0xd6960376d6c6dea93647383ffb245cfced97ccc5c7525397a543a72fdaea5265',
-    parentHash: '0x83ffb245cfced97ccc5c75253d6960376d6c6dea93647397a543a72fdaea5265',
+    parentHash:
+      '0x83ffb245cfced97ccc5c75253d6960376d6c6dea93647397a543a72fdaea5265',
     miner: '0xdcc6960376d6c6dea93647383ffb245cfced97cf',
-    stateRoot: '0x54dda68af07643f68739a6e9612ad157a26ae7e2ce81f77842bb5835fbcde583',
-    transactionsRoot: '0x64dda68af07643f68739a6e9612ad157a26ae7e2ce81f77842bb5835fbcde583',
-    receiptsRoot: '0x74dda68af07643f68739a6e9612ad157a26ae7e2ce81f77842bb5835fbcde583',
-    sha3Uncles: '0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347',
-    logsBloom: '0xd6960376d6c6dea93647383ffb245cfced97ccc5c7525397a543a72fdaea5265',
+    stateRoot:
+      '0x54dda68af07643f68739a6e9612ad157a26ae7e2ce81f77842bb5835fbcde583',
+    transactionsRoot:
+      '0x64dda68af07643f68739a6e9612ad157a26ae7e2ce81f77842bb5835fbcde583',
+    receiptsRoot:
+      '0x74dda68af07643f68739a6e9612ad157a26ae7e2ce81f77842bb5835fbcde583',
+    sha3Uncles:
+      '0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347',
+    logsBloom:
+      '0xd6960376d6c6dea93647383ffb245cfced97ccc5c7525397a543a72fdaea5265',
     difficulty: '0x3e8',
     totalDifficulty: '0x3e8',
     number: '0x11',
     gasLimit: '0x3e8',
     gasUsed: '0x3e8',
     timestamp: '0x3e8',
-    extraData: '0xd6960376d6c6dea93647383ffb245cfced97ccc5c7525397a543a72fdaea5265',
+    extraData:
+      '0xd6960376d6c6dea93647383ffb245cfced97ccc5c7525397a543a72fdaea5265',
     nonce: '0xd6960376d6c6dea93647383ffb245cfced97ccc5c7525397a543a72fdaea5265',
     size: '0x3e8',
     transactions: [],
@@ -105,28 +116,55 @@ describe('contract', () => {
     }
 
     function mockEthSubscribe() {
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_subscribe');
-        expect(params[1]).toEqual({
-          topics: [sha3(signature), '0x000000000000000000000000' + addressUnprefixedLowercase, null],
-          address: addressLowercase,
-        });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_subscribe');
+          expect(params[1]).toEqual({
+            topics: [
+              sha3(signature),
+              '0x000000000000000000000000' + addressUnprefixedLowercase,
+              null,
+            ],
+            address: addressLowercase,
+          });
 
-        emitData(10);
+          emitData(10);
 
-        return '0x123';
-      });
+          return '0x123';
+        },
+      );
     }
 
-    it('should create event subscription', done => {
+    it('should create event subscription', (done) => {
       mockEthSubscribe();
 
       const contract = new TestContract(eth, address);
 
-      const event = contract.events.Changed({ filter: { from: address } }, (err, result) => {
-        if (err) {
-          return done(err);
-        }
+      const event = contract.events.Changed(
+        { filter: { from: address } },
+        (err, result) => {
+          if (err) {
+            return done(err);
+          }
+          expect(result.returnValues.from).toEqual(address);
+          expect(result.returnValues.amount).toBe('1');
+          expect(result.returnValues.t1).toBe('1');
+          expect(result.returnValues.t2).toBe('8');
+
+          event.unsubscribe();
+          done();
+        },
+      );
+    });
+
+    it('should create event from the events object using a signature and callback', (done) => {
+      mockEthSubscribe();
+
+      const contract = new TestContract(eth, address);
+
+      const event = contract.events[
+        '0x792991ed5ba9322deaef76cff5051ce4bedaaa4d097585970f9ad8f09f54e651'
+      ]({ filter: { from: address } }, (err, result) => {
         expect(result.returnValues.from).toEqual(address);
         expect(result.returnValues.amount).toBe('1');
         expect(result.returnValues.t1).toBe('1');
@@ -137,12 +175,12 @@ describe('contract', () => {
       });
     });
 
-    it('should create event from the events object using a signature and callback', done => {
+    it('should create event from the events object using event name and parameters', (done) => {
       mockEthSubscribe();
 
       const contract = new TestContract(eth, address);
 
-      const event = contract.events['0x792991ed5ba9322deaef76cff5051ce4bedaaa4d097585970f9ad8f09f54e651'](
+      const event = contract.events[signature](
         { filter: { from: address } },
         (err, result) => {
           expect(result.returnValues.from).toEqual(address);
@@ -156,24 +194,8 @@ describe('contract', () => {
       );
     });
 
-    it('should create event from the events object using event name and parameters', done => {
-      mockEthSubscribe();
-
-      const contract = new TestContract(eth, address);
-
-      const event = contract.events[signature]({ filter: { from: address } }, (err, result) => {
-        expect(result.returnValues.from).toEqual(address);
-        expect(result.returnValues.amount).toBe('1');
-        expect(result.returnValues.t1).toBe('1');
-        expect(result.returnValues.t2).toBe('8');
-
-        event.unsubscribe();
-        done();
-      });
-    });
-
-    it('should create event from the events object and use the fromBlock option', done => {
-      mockEthereumProvider.send.mockImplementationOnce(method => {
+    it('should create event from the events object and use the fromBlock option', (done) => {
+      mockEthereumProvider.send.mockImplementationOnce((method) => {
         expect(method).toBe('eth_getLogs');
         return [
           {
@@ -216,31 +238,33 @@ describe('contract', () => {
       const contract = new TestContract(eth, address);
       let count = 0;
 
-      const event = contract.events.Changed({ fromBlock: 0, filter: { from: address } }).on('data', result => {
-        count++;
+      const event = contract.events
+        .Changed({ fromBlock: 0, filter: { from: address } })
+        .on('data', (result) => {
+          count++;
 
-        if (count === 1) {
-          expect(result.returnValues.from).toEqual(address);
-          expect(result.returnValues.amount).toBe('2');
-          expect(result.returnValues.t1).toBe('2');
-          expect(result.returnValues.t2).toBe('9');
-        }
-        if (count === 2) {
-          expect(result.returnValues.from).toEqual(address);
-          expect(result.returnValues.amount).toBe('3');
-          expect(result.returnValues.t1).toBe('4');
-          expect(result.returnValues.t2).toBe('5');
-        }
-        if (count === 3) {
-          expect(result.returnValues.from).toEqual(address);
-          expect(result.returnValues.amount).toBe('1');
-          expect(result.returnValues.t1).toBe('1');
-          expect(result.returnValues.t2).toBe('8');
+          if (count === 1) {
+            expect(result.returnValues.from).toEqual(address);
+            expect(result.returnValues.amount).toBe('2');
+            expect(result.returnValues.t1).toBe('2');
+            expect(result.returnValues.t2).toBe('9');
+          }
+          if (count === 2) {
+            expect(result.returnValues.from).toEqual(address);
+            expect(result.returnValues.amount).toBe('3');
+            expect(result.returnValues.t1).toBe('4');
+            expect(result.returnValues.t2).toBe('5');
+          }
+          if (count === 3) {
+            expect(result.returnValues.from).toEqual(address);
+            expect(result.returnValues.amount).toBe('1');
+            expect(result.returnValues.t1).toBe('1');
+            expect(result.returnValues.t2).toBe('8');
 
-          event.unsubscribe();
-          done();
-        }
-      });
+            event.unsubscribe();
+            done();
+          }
+        });
     });
 
     it('should create event using the function and unsubscribe after one log received', async () => {
@@ -250,11 +274,15 @@ describe('contract', () => {
 
       const contract = new TestContract(eth, address);
 
-      await new Promise(resolve => {
-        contract.once('Changed', { filter: { from: address } }, (err, result, sub) => {
-          count++;
-          resolve();
-        });
+      await new Promise((resolve) => {
+        contract.once(
+          'Changed',
+          { filter: { from: address } },
+          (err, result, sub) => {
+            count++;
+            resolve();
+          },
+        );
       });
 
       // Emit a second.
@@ -268,7 +296,7 @@ describe('contract', () => {
       expect(count).toBe(1);
     });
 
-    it('should create event subscription and fire the changed event, if log.removed = true', done => {
+    it('should create event subscription and fire the changed event, if log.removed = true', (done) => {
       mockEthSubscribe();
       emitData(200, { removed: true });
 
@@ -277,37 +305,41 @@ describe('contract', () => {
 
       contract.events
         .Changed({ filter: { from: address } })
-        .on('data', result => {
+        .on('data', (result) => {
           expect(count).toBe(1);
           count++;
         })
-        .on('changed', result => {
+        .on('changed', (result) => {
           expect(result.removed).toBe(true);
           expect(count).toBe(2);
           done();
         });
     });
 
-    it('should create all event filter and receive two logs', done => {
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_subscribe');
-        expect(params[1]).toEqual({
-          topics: [],
-          address: addressLowercase,
-        });
+    it('should create all event filter and receive two logs', (done) => {
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_subscribe');
+          expect(params[1]).toEqual({
+            topics: [],
+            address: addressLowercase,
+          });
 
-        emitData(100);
-        emitData(200, {
-          topics: [
-            sha3('Unchanged(uint256,address,uint256)'),
-            '0x0000000000000000000000000000000000000000000000000000000000000002',
-            '0x000000000000000000000000' + address.toString().replace('0x', ''),
-          ],
-          data: '0x0000000000000000000000000000000000000000000000000000000000000005',
-        });
+          emitData(100);
+          emitData(200, {
+            topics: [
+              sha3('Unchanged(uint256,address,uint256)'),
+              '0x0000000000000000000000000000000000000000000000000000000000000002',
+              '0x000000000000000000000000' +
+                address.toString().replace('0x', ''),
+            ],
+            data:
+              '0x0000000000000000000000000000000000000000000000000000000000000005',
+          });
 
-        return '0x123';
-      });
+          return '0x123';
+        },
+      );
 
       const contract = new TestContract(eth, address);
 
@@ -342,7 +374,9 @@ describe('contract', () => {
       const result = contract.methods.balance(address).encodeABI();
 
       expect(bufferToHex(result)).toBe(
-        sha3(signature).slice(0, 10) + '000000000000000000000000' + addressUnprefixedLowercase,
+        sha3(signature).slice(0, 10) +
+          '000000000000000000000000' +
+          addressUnprefixedLowercase,
       );
     });
 
@@ -360,16 +394,21 @@ describe('contract', () => {
     });
 
     it('should estimate a function', async () => {
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_estimateGas');
-        expect(params).toEqual([
-          {
-            data: sha3(signature).slice(0, 10) + '000000000000000000000000' + addressLowercase.replace('0x', ''),
-            to: addressLowercase,
-          },
-        ]);
-        return '0x0000000000000000000000000000000000000000000000000000000000000032';
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_estimateGas');
+          expect(params).toEqual([
+            {
+              data:
+                sha3(signature).slice(0, 10) +
+                '000000000000000000000000' +
+                addressLowercase.replace('0x', ''),
+              to: addressLowercase,
+            },
+          ]);
+          return '0x0000000000000000000000000000000000000000000000000000000000000032';
+        },
+      );
 
       const contract = new TestContract(eth, address);
 
@@ -378,59 +417,74 @@ describe('contract', () => {
     });
 
     it('should estimate the constructor', async () => {
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_estimateGas');
-        expect(params).toEqual([
-          {
-            data:
-              '0x1234000000000000000000000000' +
-              addressLowercase.replace('0x', '') +
-              '0000000000000000000000000000000000000000000000000000000000000032',
-          },
-        ]);
-        return '0x000000000000000000000000000000000000000000000000000000000000000a';
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_estimateGas');
+          expect(params).toEqual([
+            {
+              data:
+                '0x1234000000000000000000000000' +
+                addressLowercase.replace('0x', '') +
+                '0000000000000000000000000000000000000000000000000000000000000032',
+            },
+          ]);
+          return '0x000000000000000000000000000000000000000000000000000000000000000a';
+        },
+      );
 
       const contract = new TestContract(eth, address);
 
-      const res = await contract.deployBytecode('0x1234', address, 50).estimateGas();
+      const res = await contract
+        .deployBytecode('0x1234', address, 50)
+        .estimateGas();
       expect(res).toBe(10);
     });
 
     it('should send with many parameters', async () => {
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_call');
-        expect(params).toEqual([
-          {
-            data:
-              '0x8708f4a12454534500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000000c30786666323435343533343500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004ff24545345000000000000000000000000000000000000000000000000000000534500000000000000000000000000000000000000000000000000000000000045450000000000000000000000000000000000000000000000000000000000004533450000000000000000000000000000000000000000000000000000000000',
-            to: addressLowercase,
-          },
-          'latest',
-        ]);
-        return '0x000000000000000000000000' + addressLowercase.replace('0x', '');
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_call');
+          expect(params).toEqual([
+            {
+              data:
+                '0x8708f4a12454534500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000000c30786666323435343533343500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004ff24545345000000000000000000000000000000000000000000000000000000534500000000000000000000000000000000000000000000000000000000000045450000000000000000000000000000000000000000000000000000000000004533450000000000000000000000000000000000000000000000000000000000',
+              to: addressLowercase,
+            },
+            'latest',
+          ]);
+          return (
+            '0x000000000000000000000000' + addressLowercase.replace('0x', '')
+          );
+        },
+      );
 
       const contract = new TestContract(eth, address);
 
       const res = await contract.methods
-        .hasALotOfParams('0x24545345', '0xff24545345', ['0xff24545345', '0x5345', '0x4545', '0x453345'])
+        .hasALotOfParams('0x24545345', '0xff24545345', [
+          '0xff24545345',
+          '0x5345',
+          '0x4545',
+          '0x453345',
+        ])
         .call();
       expect(res).toEqual(address);
     });
 
     it('should send overload functions with zero parameters', async () => {
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_call');
-        expect(params).toEqual([
-          {
-            data: '0xbb853481',
-            to: addressLowercase,
-          },
-          'latest',
-        ]);
-        return '0x0000000000000000000000000000000000000000000000000000000000000005';
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_call');
+          expect(params).toEqual([
+            {
+              data: '0xbb853481',
+              to: addressLowercase,
+            },
+            'latest',
+          ]);
+          return '0x0000000000000000000000000000000000000000000000000000000000000005';
+        },
+      );
 
       const contract = new TestContract(eth, address);
       const res = await contract.methods.overloadedFunction().call();
@@ -438,17 +492,20 @@ describe('contract', () => {
     });
 
     it('should send overload functions with one parameters', async () => {
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_call');
-        expect(params).toEqual([
-          {
-            data: '0x533678270000000000000000000000000000000000000000000000000000000000000006',
-            to: addressLowercase,
-          },
-          'latest',
-        ]);
-        return '0x0000000000000000000000000000000000000000000000000000000000000006';
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_call');
+          expect(params).toEqual([
+            {
+              data:
+                '0x533678270000000000000000000000000000000000000000000000000000000000000006',
+              to: addressLowercase,
+            },
+            'latest',
+          ]);
+          return '0x0000000000000000000000000000000000000000000000000000000000000006';
+        },
+      );
 
       const contract = new TestContract(eth, address);
 
@@ -457,17 +514,22 @@ describe('contract', () => {
     });
 
     it('should call constant function', async () => {
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_call');
-        expect(params).toEqual([
-          {
-            data: sha3(signature).slice(0, 10) + '000000000000000000000000' + addressLowercase.replace('0x', ''),
-            to: addressLowercase,
-          },
-          'latest',
-        ]);
-        return '0x0000000000000000000000000000000000000000000000000000000000000032';
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_call');
+          expect(params).toEqual([
+            {
+              data:
+                sha3(signature).slice(0, 10) +
+                '000000000000000000000000' +
+                addressLowercase.replace('0x', ''),
+              to: addressLowercase,
+            },
+            'latest',
+          ]);
+          return '0x0000000000000000000000000000000000000000000000000000000000000032';
+        },
+      );
 
       const contract = new TestContract(eth, address);
 
@@ -476,17 +538,22 @@ describe('contract', () => {
     });
 
     it('should call constant function with default block', async () => {
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_call');
-        expect(params).toEqual([
-          {
-            data: sha3(signature).slice(0, 10) + '000000000000000000000000' + addressLowercase.replace('0x', ''),
-            to: addressLowercase,
-          },
-          '0xb',
-        ]);
-        return '0x0000000000000000000000000000000000000000000000000000000000000032';
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_call');
+          expect(params).toEqual([
+            {
+              data:
+                sha3(signature).slice(0, 10) +
+                '000000000000000000000000' +
+                addressLowercase.replace('0x', ''),
+              to: addressLowercase,
+            },
+            '0xb',
+          ]);
+          return '0x0000000000000000000000000000000000000000000000000000000000000032';
+        },
+      );
 
       const contract = new TestContract(eth, address);
 
@@ -495,42 +562,50 @@ describe('contract', () => {
     });
 
     it('should call constant concurrently', async () => {
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_call');
-        expect(params).toEqual([
-          {
-            data:
-              sha3('balance(address)').slice(0, 10) + '000000000000000000000000' + addressLowercase.replace('0x', ''),
-            to: addressLowercase,
-          },
-          'latest',
-        ]);
-        return '0x000000000000000000000000000000000000000000000000000000000000000a';
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_call');
+          expect(params).toEqual([
+            {
+              data:
+                sha3('balance(address)').slice(0, 10) +
+                '000000000000000000000000' +
+                addressLowercase.replace('0x', ''),
+              to: addressLowercase,
+            },
+            'latest',
+          ]);
+          return '0x000000000000000000000000000000000000000000000000000000000000000a';
+        },
+      );
 
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_call');
-        expect(params).toEqual([
-          {
-            data: sha3('owner()').slice(0, 10),
-            to: addressLowercase,
-          },
-          'latest',
-        ]);
-        return '0x00000000000000000000000011f4d0a3c12e86b4b5f39b213f7e19d048276dae';
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_call');
+          expect(params).toEqual([
+            {
+              data: sha3('owner()').slice(0, 10),
+              to: addressLowercase,
+            },
+            'latest',
+          ]);
+          return '0x00000000000000000000000011f4d0a3c12e86b4b5f39b213f7e19d048276dae';
+        },
+      );
 
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_call');
-        expect(params).toEqual([
-          {
-            data: sha3('getStr()').slice(0, 10),
-            to: addressLowercase,
-          },
-          'latest',
-        ]);
-        return '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000848656c6c6f212521000000000000000000000000000000000000000000000000';
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_call');
+          expect(params).toEqual([
+            {
+              data: sha3('getStr()').slice(0, 10),
+              to: addressLowercase,
+            },
+            'latest',
+          ]);
+          return '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000848656c6c6f212521000000000000000000000000000000000000000000000000';
+        },
+      );
 
       const contract = new TestContract(eth, address);
 
@@ -550,37 +625,43 @@ describe('contract', () => {
 
       const contract = new TestContract(eth, address);
 
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_call');
-        expect(params).toEqual([
-          {
-            data: sha3(signature).slice(0, 10),
-            to: addressLowercase,
-            from: address2,
-          },
-          'latest',
-        ]);
-        return '0x';
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_call');
+          expect(params).toEqual([
+            {
+              data: sha3(signature).slice(0, 10),
+              to: addressLowercase,
+              from: address2,
+            },
+            'latest',
+          ]);
+          return '0x';
+        },
+      );
 
-      await expect(contract.methods.getStr().call({ from: address2 })).rejects.toBeInstanceOf(Error);
+      await expect(
+        contract.methods.getStr().call({ from: address2 }),
+      ).rejects.toBeInstanceOf(Error);
     });
 
     it('should return an empty string when 0x0', async () => {
       const signature = 'getStr()';
 
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_call');
-        expect(params).toEqual([
-          {
-            data: sha3(signature).slice(0, 10),
-            to: addressLowercase,
-            from: address2.toString().toLowerCase(),
-          },
-          'latest',
-        ]);
-        return '0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000';
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_call');
+          expect(params).toEqual([
+            {
+              data: sha3(signature).slice(0, 10),
+              to: addressLowercase,
+              from: address2.toString().toLowerCase(),
+            },
+            'latest',
+          ]);
+          return '0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000';
+        },
+      );
 
       const contract = new TestContract(eth, address);
 
@@ -622,7 +703,8 @@ describe('contract', () => {
             transactionIndex: '0x0',
             blockHash: '0x1345',
             logIndex: '0x0',
-            data: '0x0000000000000000000000000000000000000000000000000000000000000005',
+            data:
+              '0x0000000000000000000000000000000000000000000000000000000000000005',
           },
           {
             address: addressLowercase,
@@ -727,14 +809,16 @@ describe('contract', () => {
             transactionIndex: 0,
             returnValues: expect.any(Object),
             event: 'Unchanged',
-            signature: '0xf359668f205d0b5cfdc20d11353e05f633f83322e96f15486cbb007d210d66e5',
+            signature:
+              '0xf359668f205d0b5cfdc20d11353e05f633f83322e96f15486cbb007d210d66e5',
             raw: {
               topics: [
                 '0xf359668f205d0b5cfdc20d11353e05f633f83322e96f15486cbb007d210d66e5',
                 '0x0000000000000000000000000000000000000000000000000000000000000002',
                 '0x000000000000000000000000' + addressUnprefixedLowercase,
               ],
-              data: '0x0000000000000000000000000000000000000000000000000000000000000005',
+              data:
+                '0x0000000000000000000000000000000000000000000000000000000000000005',
             },
           },
         ],
@@ -749,7 +833,8 @@ describe('contract', () => {
             transactionIndex: 0,
             returnValues: expect.any(Object),
             event: 'Changed',
-            signature: '0x792991ed5ba9322deaef76cff5051ce4bedaaa4d097585970f9ad8f09f54e651',
+            signature:
+              '0x792991ed5ba9322deaef76cff5051ce4bedaaa4d097585970f9ad8f09f54e651',
             raw: {
               topics: [
                 '0x792991ed5ba9322deaef76cff5051ce4bedaaa4d097585970f9ad8f09f54e651',
@@ -874,11 +959,13 @@ describe('contract', () => {
               t2: '8',
             },
             event: 'Changed',
-            signature: '0x792991ed5ba9322deaef76cff5051ce4bedaaa4d097585970f9ad8f09f54e651',
+            signature:
+              '0x792991ed5ba9322deaef76cff5051ce4bedaaa4d097585970f9ad8f09f54e651',
             raw: {
               topics: [
                 '0x792991ed5ba9322deaef76cff5051ce4bedaaa4d097585970f9ad8f09f54e651',
-                '0x000000000000000000000000' + addressLowercase.replace('0x', ''),
+                '0x000000000000000000000000' +
+                  addressLowercase.replace('0x', ''),
                 '0x0000000000000000000000000000000000000000000000000000000000000001',
               ],
               data:
@@ -904,11 +991,13 @@ describe('contract', () => {
               t2: '8',
             },
             event: 'Changed',
-            signature: '0x792991ed5ba9322deaef76cff5051ce4bedaaa4d097585970f9ad8f09f54e651',
+            signature:
+              '0x792991ed5ba9322deaef76cff5051ce4bedaaa4d097585970f9ad8f09f54e651',
             raw: {
               topics: [
                 '0x792991ed5ba9322deaef76cff5051ce4bedaaa4d097585970f9ad8f09f54e651',
-                '0x000000000000000000000000' + addressLowercase.replace('0x', ''),
+                '0x000000000000000000000000' +
+                  addressLowercase.replace('0x', ''),
                 '0x0000000000000000000000000000000000000000000000000000000000000002',
               ],
               data:
@@ -919,7 +1008,7 @@ describe('contract', () => {
       });
     });
 
-    it('should sendTransaction and receive multiple confirmations', done => {
+    it('should sendTransaction and receive multiple confirmations', (done) => {
       // eth_sendTransaction
       mockEthereumProvider.send.mockResolvedValueOnce(
         '0x1234000000000000000000000000000000000000000000000000000000056789',
@@ -1004,21 +1093,23 @@ describe('contract', () => {
     });
 
     it('should sendTransaction to contract function', async () => {
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_sendTransaction');
-        expect(params).toEqual([
-          {
-            data:
-              signature +
-              '000000000000000000000000' +
-              addressLowercase.replace('0x', '') +
-              '0000000000000000000000000000000000000000000000000000000000000011',
-            from: addressLowercase,
-            to: addressLowercase,
-            gasPrice: '0x369d1f7fd2',
-          },
-        ]);
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_sendTransaction');
+          expect(params).toEqual([
+            {
+              data:
+                signature +
+                '000000000000000000000000' +
+                addressLowercase.replace('0x', '') +
+                '0000000000000000000000000000000000000000000000000000000000000011',
+              from: addressLowercase,
+              to: addressLowercase,
+              gasPrice: '0x369d1f7fd2',
+            },
+          ]);
+        },
+      );
 
       // eth_getTransactionReceipt
       mockEthereumProvider.send.mockResolvedValueOnce({
@@ -1027,35 +1118,41 @@ describe('contract', () => {
 
       const contract = new TestContract(eth, address);
 
-      await contract.methods.mySend(address, 17).send({ from: address, gasPrice: '234564321234' });
+      await contract.methods
+        .mySend(address, 17)
+        .send({ from: address, gasPrice: '234564321234' });
     });
 
     it('should throw error when trying to send ether to a non payable contract function', async () => {
       const contract = new TestContract(eth, address);
 
       await expect(() =>
-        contract.methods.myDisallowedSend(address, 17).send({ from: address, value: 123 }),
+        contract.methods
+          .myDisallowedSend(address, 17)
+          .send({ from: address, value: 123 }),
       ).toThrowError(/non-payable/);
     });
 
     it('should not throw error when trying to not send ether to a non payable contract function', async () => {
       const signature = 'myDisallowedSend(address,uint256)';
 
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_sendTransaction');
-        expect(params).toEqual([
-          {
-            data:
-              sha3(signature).slice(0, 10) +
-              '000000000000000000000000' +
-              addressLowercase.replace('0x', '') +
-              '0000000000000000000000000000000000000000000000000000000000000011',
-            from: addressLowercase,
-            to: addressLowercase,
-            gasPrice: '0x1555757ee6b1',
-          },
-        ]);
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_sendTransaction');
+          expect(params).toEqual([
+            {
+              data:
+                sha3(signature).slice(0, 10) +
+                '000000000000000000000000' +
+                addressLowercase.replace('0x', '') +
+                '0000000000000000000000000000000000000000000000000000000000000011',
+              from: addressLowercase,
+              to: addressLowercase,
+              gasPrice: '0x1555757ee6b1',
+            },
+          ]);
+        },
+      );
 
       mockEthereumProvider.send.mockResolvedValueOnce({
         contractAddress: null,
@@ -1070,7 +1167,9 @@ describe('contract', () => {
 
       const contract = new TestContract(eth, address);
 
-      await contract.methods.myDisallowedSend(address, 17).send({ from: address, gasPrice: '23456787654321' });
+      await contract.methods
+        .myDisallowedSend(address, 17)
+        .send({ from: address, gasPrice: '23456787654321' });
     });
 
     it('should sendTransaction to contract function using the function name incl. parameters', async () => {
@@ -1093,18 +1192,21 @@ describe('contract', () => {
         })
         .getTxHash();
 
-      expect(mockEthereumProvider.send).toHaveBeenCalledWith('eth_sendTransaction', [
-        {
-          data:
-            signature +
-            '000000000000000000000000' +
-            addressLowercase.replace('0x', '') +
-            '0000000000000000000000000000000000000000000000000000000000000011',
-          from: addressLowercase,
-          to: addressLowercase,
-          gasPrice: '0x1555757ee6b1',
-        },
-      ]);
+      expect(mockEthereumProvider.send).toHaveBeenCalledWith(
+        'eth_sendTransaction',
+        [
+          {
+            data:
+              signature +
+              '000000000000000000000000' +
+              addressLowercase.replace('0x', '') +
+              '0000000000000000000000000000000000000000000000000000000000000011',
+            from: addressLowercase,
+            to: addressLowercase,
+            gasPrice: '0x1555757ee6b1',
+          },
+        ],
+      );
     });
 
     it('should sendTransaction to contract function using the signature', async () => {
@@ -1124,133 +1226,155 @@ describe('contract', () => {
         .send({ from: address, gasPrice: '1230000000' })
         .getTxHash();
 
-      expect(mockEthereumProvider.send).toHaveBeenCalledWith('eth_sendTransaction', [
-        {
-          data:
-            signature +
-            '000000000000000000000000' +
-            addressLowercase.replace('0x', '') +
-            '0000000000000000000000000000000000000000000000000000000000000011',
-          from: addressLowercase,
-          to: addressLowercase,
-          gasPrice: '0x49504f80',
-        },
-      ]);
-    });
-
-    it('should throw when trying to create a tx object and wrong amount of params', () => {
-      const contract = new Contract(eth, TestContractAbi, address);
-      expect(() => contract.methods.mySend(address)).toThrowError('No matching method with 1 arguments for mySend.');
-    });
-
-    it('should make a call with optional params', done => {
-      const signature = 'balance(address)';
-      let count = 0;
-
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        count++;
-        if (count > 1) {
-          return;
-        }
-
-        expect(method).toBe('eth_call');
-        expect(params).toEqual([
-          {
-            data: sha3(signature).slice(0, 10) + '000000000000000000000000' + addressLowercase.replace('0x', ''),
-            to: addressLowercase,
-            from: addressLowercase,
-            gas: '0xc350',
-          },
-          'latest',
-        ]);
-        return '0x0000000000000000000000000000000000000000000000000000000000000032';
-      });
-
-      const contract = new TestContract(eth, address);
-
-      contract.methods
-        .balance(address)
-        .call({ from: address, gas: 50000 })
-        .then(r => {
-          expect(r).toBe('50');
-          done();
-        });
-    });
-
-    it('should explicitly make a call with optional params', done => {
-      const signature = 'balance(address)';
-
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_call');
-        expect(params).toEqual([
-          {
-            data: sha3(signature).slice(0, 10) + '000000000000000000000000' + addressLowercase.replace('0x', ''),
-            to: addressLowercase,
-            from: addressLowercase,
-            gas: '0xc350',
-          },
-          'latest',
-        ]);
-        return '0x0000000000000000000000000000000000000000000000000000000000000032';
-      });
-
-      const contract = new TestContract(eth, address);
-
-      contract.methods
-        .balance(address)
-        .call({ from: address, gas: 50000 })
-        .then(r => {
-          expect(r).toBe('50');
-          done();
-        });
-    });
-
-    it('should explicitly make a call with optional params and defaultBlock', done => {
-      const signature = 'balance(address)';
-
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_call');
-        expect(params).toEqual([
-          {
-            data: sha3(signature).slice(0, 10) + '000000000000000000000000' + addressLowercase.replace('0x', ''),
-            to: addressLowercase,
-            from: addressLowercase,
-            gas: '0xc350',
-          },
-          '0xb',
-        ]);
-        return '0x0000000000000000000000000000000000000000000000000000000000000032';
-      });
-
-      const contract = new TestContract(eth, address);
-
-      contract.methods
-        .balance(address)
-        .call({ from: address, gas: 50000 }, 11)
-        .then(r => {
-          expect(r).toBe('50');
-          done();
-        });
-    });
-
-    it('should sendTransaction with optional params', async () => {
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_sendTransaction');
-        expect(params).toEqual([
+      expect(mockEthereumProvider.send).toHaveBeenCalledWith(
+        'eth_sendTransaction',
+        [
           {
             data:
               signature +
               '000000000000000000000000' +
               addressLowercase.replace('0x', '') +
               '0000000000000000000000000000000000000000000000000000000000000011',
-            to: addressLowercase,
             from: addressLowercase,
-            gas: '0xc350',
-            gasPrice: '0xbb8',
-            value: '0x2710',
+            to: addressLowercase,
+            gasPrice: '0x49504f80',
           },
-        ]);
-      });
+        ],
+      );
+    });
+
+    it('should throw when trying to create a tx object and wrong amount of params', () => {
+      const contract = new Contract(eth, TestContractAbi, address);
+      expect(() => contract.methods.mySend(address)).toThrowError(
+        'No matching method with 1 arguments for mySend.',
+      );
+    });
+
+    it('should make a call with optional params', (done) => {
+      const signature = 'balance(address)';
+      let count = 0;
+
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          count++;
+          if (count > 1) {
+            return;
+          }
+
+          expect(method).toBe('eth_call');
+          expect(params).toEqual([
+            {
+              data:
+                sha3(signature).slice(0, 10) +
+                '000000000000000000000000' +
+                addressLowercase.replace('0x', ''),
+              to: addressLowercase,
+              from: addressLowercase,
+              gas: '0xc350',
+            },
+            'latest',
+          ]);
+          return '0x0000000000000000000000000000000000000000000000000000000000000032';
+        },
+      );
+
+      const contract = new TestContract(eth, address);
+
+      contract.methods
+        .balance(address)
+        .call({ from: address, gas: 50000 })
+        .then((r) => {
+          expect(r).toBe('50');
+          done();
+        });
+    });
+
+    it('should explicitly make a call with optional params', (done) => {
+      const signature = 'balance(address)';
+
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_call');
+          expect(params).toEqual([
+            {
+              data:
+                sha3(signature).slice(0, 10) +
+                '000000000000000000000000' +
+                addressLowercase.replace('0x', ''),
+              to: addressLowercase,
+              from: addressLowercase,
+              gas: '0xc350',
+            },
+            'latest',
+          ]);
+          return '0x0000000000000000000000000000000000000000000000000000000000000032';
+        },
+      );
+
+      const contract = new TestContract(eth, address);
+
+      contract.methods
+        .balance(address)
+        .call({ from: address, gas: 50000 })
+        .then((r) => {
+          expect(r).toBe('50');
+          done();
+        });
+    });
+
+    it('should explicitly make a call with optional params and defaultBlock', (done) => {
+      const signature = 'balance(address)';
+
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_call');
+          expect(params).toEqual([
+            {
+              data:
+                sha3(signature).slice(0, 10) +
+                '000000000000000000000000' +
+                addressLowercase.replace('0x', ''),
+              to: addressLowercase,
+              from: addressLowercase,
+              gas: '0xc350',
+            },
+            '0xb',
+          ]);
+          return '0x0000000000000000000000000000000000000000000000000000000000000032';
+        },
+      );
+
+      const contract = new TestContract(eth, address);
+
+      contract.methods
+        .balance(address)
+        .call({ from: address, gas: 50000 }, 11)
+        .then((r) => {
+          expect(r).toBe('50');
+          done();
+        });
+    });
+
+    it('should sendTransaction with optional params', async () => {
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_sendTransaction');
+          expect(params).toEqual([
+            {
+              data:
+                signature +
+                '000000000000000000000000' +
+                addressLowercase.replace('0x', '') +
+                '0000000000000000000000000000000000000000000000000000000000000011',
+              to: addressLowercase,
+              from: addressLowercase,
+              gas: '0xc350',
+              gasPrice: '0xbb8',
+              value: '0x2710',
+            },
+          ]);
+        },
+      );
 
       // eth_getTransactionReceipt
       mockEthereumProvider.send.mockResolvedValueOnce({
@@ -1259,30 +1383,36 @@ describe('contract', () => {
 
       const contract = new TestContract(eth, address);
 
-      await contract.methods.mySend(address, 17).send({ from: address, gas: 50000, gasPrice: 3000, value: 10000 });
+      await contract.methods
+        .mySend(address, 17)
+        .send({ from: address, gas: 50000, gasPrice: 3000, value: 10000 });
     });
 
     it('should sendTransaction and fill in default gasPrice', async () => {
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_gasPrice');
-        return '0x45656456456456';
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_gasPrice');
+          return '0x45656456456456';
+        },
+      );
 
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_sendTransaction');
-        expect(params).toEqual([
-          {
-            data:
-              signature +
-              '000000000000000000000000' +
-              addressLowercase.replace('0x', '') +
-              '0000000000000000000000000000000000000000000000000000000000000011',
-            to: addressLowercase,
-            from: addressLowercase,
-            gasPrice: '0x45656456456456',
-          },
-        ]);
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_sendTransaction');
+          expect(params).toEqual([
+            {
+              data:
+                signature +
+                '000000000000000000000000' +
+                addressLowercase.replace('0x', '') +
+                '0000000000000000000000000000000000000000000000000000000000000011',
+              to: addressLowercase,
+              from: addressLowercase,
+              gasPrice: '0x45656456456456',
+            },
+          ]);
+        },
+      );
 
       // eth_getTransactionReceipt
       mockEthereumProvider.send.mockResolvedValueOnce({
@@ -1295,23 +1425,25 @@ describe('contract', () => {
     });
 
     it('should explicitly sendTransaction with optional params', async () => {
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_sendTransaction');
-        expect(params).toEqual([
-          {
-            data:
-              signature +
-              '000000000000000000000000' +
-              addressLowercase.replace('0x', '') +
-              '0000000000000000000000000000000000000000000000000000000000000011',
-            to: addressLowercase,
-            from: addressLowercase,
-            gas: '0xc350',
-            gasPrice: '0xbb8',
-            value: '0x2710',
-          },
-        ]);
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_sendTransaction');
+          expect(params).toEqual([
+            {
+              data:
+                signature +
+                '000000000000000000000000' +
+                addressLowercase.replace('0x', '') +
+                '0000000000000000000000000000000000000000000000000000000000000011',
+              to: addressLowercase,
+              from: addressLowercase,
+              gas: '0xc350',
+              gasPrice: '0xbb8',
+              value: '0x2710',
+            },
+          ]);
+        },
+      );
 
       // eth_getTransactionReceipt
       mockEthereumProvider.send.mockResolvedValueOnce({
@@ -1320,29 +1452,33 @@ describe('contract', () => {
 
       const contract = new TestContract(eth, address);
 
-      await contract.methods.mySend(address, 17).send({ from: address, gas: 50000, gasPrice: 3000, value: 10000 });
+      await contract.methods
+        .mySend(address, 17)
+        .send({ from: address, gas: 50000, gasPrice: 3000, value: 10000 });
     });
 
     it('should explicitly estimateGas with optional params', async () => {
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_estimateGas');
-        expect(params).toEqual([
-          {
-            data:
-              signature +
-              '000000000000000000000000' +
-              addressUnprefixedLowercase +
-              '0000000000000000000000000000000000000000000000000000000000000011',
-            to: addressLowercase,
-            from: addressLowercase,
-            gas: '0xc350',
-            gasPrice: '0xbb8',
-            value: '0x2710',
-          },
-        ]);
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_estimateGas');
+          expect(params).toEqual([
+            {
+              data:
+                signature +
+                '000000000000000000000000' +
+                addressUnprefixedLowercase +
+                '0000000000000000000000000000000000000000000000000000000000000011',
+              to: addressLowercase,
+              from: addressLowercase,
+              gas: '0xc350',
+              gasPrice: '0xbb8',
+              value: '0x2710',
+            },
+          ]);
 
-        return '0x10';
-      });
+          return '0x10';
+        },
+      );
 
       // eth_getTransactionReceipt
       mockEthereumProvider.send.mockResolvedValueOnce({
@@ -1353,7 +1489,12 @@ describe('contract', () => {
 
       const gasUsed = await contract.methods
         .mySend(address, 17)
-        .estimateGas({ from: address, gas: 50000, gasPrice: 3000, value: 10000 });
+        .estimateGas({
+          from: address,
+          gas: 50000,
+          gasPrice: 3000,
+          value: 10000,
+        });
 
       expect(gasUsed).toBe(16);
     });
@@ -1372,55 +1513,61 @@ describe('contract', () => {
         '0x0000000000000000000000000000000000000000000000000000000000000003',
       ];
 
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_getLogs');
-        expect(params).toEqual([
-          {
-            address: addressLowercase,
-            topics: [
-              '0x792991ed5ba9322deaef76cff5051ce4bedaaa4d097585970f9ad8f09f54e651',
-              '0x000000000000000000000000' + address2.toString().replace('0x', ''),
-              null,
-            ],
-          },
-        ]);
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_getLogs');
+          expect(params).toEqual([
+            {
+              address: addressLowercase,
+              topics: [
+                '0x792991ed5ba9322deaef76cff5051ce4bedaaa4d097585970f9ad8f09f54e651',
+                '0x000000000000000000000000' +
+                  address2.toString().replace('0x', ''),
+                null,
+              ],
+            },
+          ]);
 
-        return [
-          {
-            address,
-            topics: topic1,
-            blockNumber: '0x3',
-            transactionHash: '0x1234',
-            transactionIndex: '0x0',
-            blockHash: '0x1345',
-            logIndex: '0x4',
-            data:
-              '0x0000000000000000000000000000000000000000000000000000000000000002' +
-              '0000000000000000000000000000000000000000000000000000000000000009',
-          },
-          {
-            address,
-            topics: topic2,
-            blockNumber: '0x4',
-            transactionHash: '0x1235',
-            transactionIndex: '0x0',
-            blockHash: '0x1346',
-            logIndex: '0x1',
-            data:
-              '0x0000000000000000000000000000000000000000000000000000000000000004' +
-              '0000000000000000000000000000000000000000000000000000000000000005',
-          },
-        ];
-      });
+          return [
+            {
+              address,
+              topics: topic1,
+              blockNumber: '0x3',
+              transactionHash: '0x1234',
+              transactionIndex: '0x0',
+              blockHash: '0x1345',
+              logIndex: '0x4',
+              data:
+                '0x0000000000000000000000000000000000000000000000000000000000000002' +
+                '0000000000000000000000000000000000000000000000000000000000000009',
+            },
+            {
+              address,
+              topics: topic2,
+              blockNumber: '0x4',
+              transactionHash: '0x1235',
+              transactionIndex: '0x0',
+              blockHash: '0x1346',
+              logIndex: '0x1',
+              data:
+                '0x0000000000000000000000000000000000000000000000000000000000000004' +
+                '0000000000000000000000000000000000000000000000000000000000000005',
+            },
+          ];
+        },
+      );
 
       const contract = new TestContract(eth, address);
 
-      const result = await contract.getPastEvents('Changed', { filter: { from: address2 } });
+      const result = await contract.getPastEvents('Changed', {
+        filter: { from: address2 },
+      });
 
       expect(result).toEqual([
         {
           event: 'Changed',
-          signature: '0x792991ed5ba9322deaef76cff5051ce4bedaaa4d097585970f9ad8f09f54e651',
+          signature:
+            '0x792991ed5ba9322deaef76cff5051ce4bedaaa4d097585970f9ad8f09f54e651',
           id: 'log_9ff24cb4',
           address,
           blockNumber: 3,
@@ -1447,7 +1594,8 @@ describe('contract', () => {
         },
         {
           event: 'Changed',
-          signature: '0x792991ed5ba9322deaef76cff5051ce4bedaaa4d097585970f9ad8f09f54e651',
+          signature:
+            '0x792991ed5ba9322deaef76cff5051ce4bedaaa4d097585970f9ad8f09f54e651',
           id: 'log_29c93e15',
           address,
           blockNumber: 4,
@@ -1475,24 +1623,26 @@ describe('contract', () => {
       ]);
     });
 
-    it('should call testArr method and properly parse result', done => {
+    it('should call testArr method and properly parse result', (done) => {
       const signature = 'testArr(int[])';
 
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_call');
-        expect(params).toEqual([
-          {
-            data:
-              sha3(signature).slice(0, 10) +
-              '0000000000000000000000000000000000000000000000000000000000000020' +
-              '0000000000000000000000000000000000000000000000000000000000000001' +
-              '0000000000000000000000000000000000000000000000000000000000000003',
-            to: addressLowercase,
-          },
-          'latest',
-        ]);
-        return '0x0000000000000000000000000000000000000000000000000000000000000005';
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_call');
+          expect(params).toEqual([
+            {
+              data:
+                sha3(signature).slice(0, 10) +
+                '0000000000000000000000000000000000000000000000000000000000000020' +
+                '0000000000000000000000000000000000000000000000000000000000000001' +
+                '0000000000000000000000000000000000000000000000000000000000000003',
+              to: addressLowercase,
+            },
+            'latest',
+          ]);
+          return '0x0000000000000000000000000000000000000000000000000000000000000005';
+        },
+      );
 
       // eth_getTransactionReceipt
       mockEthereumProvider.send.mockResolvedValueOnce({
@@ -1504,7 +1654,7 @@ describe('contract', () => {
       contract.methods
         .testArr([3])
         .call()
-        .then(result => {
+        .then((result) => {
           expect(result).toBe('5');
           done();
         });
@@ -1513,17 +1663,21 @@ describe('contract', () => {
     it('should call owner method, properly', async () => {
       const signature = 'owner()';
 
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_call');
-        expect(params).toEqual([
-          {
-            data: sha3(signature).slice(0, 10),
-            to: addressLowercase,
-          },
-          'latest',
-        ]);
-        return '0x000000000000000000000000' + addressLowercase.replace('0x', '');
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_call');
+          expect(params).toEqual([
+            {
+              data: sha3(signature).slice(0, 10),
+              to: addressLowercase,
+            },
+            'latest',
+          ]);
+          return (
+            '0x000000000000000000000000' + addressLowercase.replace('0x', '')
+          );
+        },
+      );
 
       // eth_getTransactionReceipt
       mockEthereumProvider.send.mockResolvedValueOnce({
@@ -1536,25 +1690,29 @@ describe('contract', () => {
       expect(result).toEqual(address);
     });
 
-    it('should decode an struct correctly', done => {
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_call');
-        expect(params).toEqual([
-          {
-            data: '0x2a4aedd5000000000000000000000000' + addressUnprefixedLowercase,
-            to: addressLowercase,
-          },
-          'latest',
-        ]);
-        return '0x0000000000000000000000000000000000000000000000000000000000000001';
-      });
+    it('should decode an struct correctly', (done) => {
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_call');
+          expect(params).toEqual([
+            {
+              data:
+                '0x2a4aedd5000000000000000000000000' +
+                addressUnprefixedLowercase,
+              to: addressLowercase,
+            },
+            'latest',
+          ]);
+          return '0x0000000000000000000000000000000000000000000000000000000000000001';
+        },
+      );
 
       const contract = new TestContract(eth, address);
 
       contract.methods
         .listOfNestedStructs(address)
         .call()
-        .then(result => {
+        .then((result) => {
           const expectedArray: any = [];
           expectedArray[0] = true;
           expectedArray.status = true;
@@ -1565,18 +1723,21 @@ describe('contract', () => {
     });
 
     it('should call an contract method with an struct as parameter', async () => {
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_sendTransaction');
-        expect(params).toEqual([
-          {
-            data: '0x814a4d160000000000000000000000000000000000000000000000000000000000000001',
-            from: addressLowercase,
-            gas: '0xc350',
-            gasPrice: '0xbb8',
-            to: addressLowercase,
-          },
-        ]);
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_sendTransaction');
+          expect(params).toEqual([
+            {
+              data:
+                '0x814a4d160000000000000000000000000000000000000000000000000000000000000001',
+              from: addressLowercase,
+              gas: '0xc350',
+              gasPrice: '0xbb8',
+              to: addressLowercase,
+            },
+          ]);
+        },
+      );
 
       // eth_getTransactionReceipt
       mockEthereumProvider.send.mockResolvedValueOnce({
@@ -1606,59 +1767,75 @@ describe('contract', () => {
     };
 
     it('should deploy a contract and use all promise steps', async () => {
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_sendTransaction');
-        expect(params).toEqual([
-          {
-            data:
-              '0x01234567000000000000000000000000' +
-              addressUnprefixedLowercase +
-              '00000000000000000000000000000000000000000000000000000000000000c8',
-            from: addressLowercase,
-            gas: '0xc350',
-            gasPrice: '0xbb8',
-          },
-        ]);
-        return '0x5550000000000000000000000000000000000000000000000000000000000032';
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_sendTransaction');
+          expect(params).toEqual([
+            {
+              data:
+                '0x01234567000000000000000000000000' +
+                addressUnprefixedLowercase +
+                '00000000000000000000000000000000000000000000000000000000000000c8',
+              from: addressLowercase,
+              gas: '0xc350',
+              gasPrice: '0xbb8',
+            },
+          ]);
+          return '0x5550000000000000000000000000000000000000000000000000000000000032';
+        },
+      );
 
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_getTransactionReceipt');
-        expect(params).toEqual(['0x5550000000000000000000000000000000000000000000000000000000000032']);
-        return null;
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_getTransactionReceipt');
+          expect(params).toEqual([
+            '0x5550000000000000000000000000000000000000000000000000000000000032',
+          ]);
+          return null;
+        },
+      );
 
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_subscribe');
-        expect(params).toEqual(['newHeads']);
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_subscribe');
+          expect(params).toEqual(['newHeads']);
 
-        setTimeout(() => {
-          mockEthereumProvider.emit('notification', {
-            subscription: '0x123',
-            result: blockHeader,
-          });
-        }, 100);
+          setTimeout(() => {
+            mockEthereumProvider.emit('notification', {
+              subscription: '0x123',
+              result: blockHeader,
+            });
+          }, 100);
 
-        return '0x123';
-      });
+          return '0x123';
+        },
+      );
 
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_getTransactionReceipt');
-        expect(params).toEqual(['0x5550000000000000000000000000000000000000000000000000000000000032']);
-        return txReceipt;
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_getTransactionReceipt');
+          expect(params).toEqual([
+            '0x5550000000000000000000000000000000000000000000000000000000000032',
+          ]);
+          return txReceipt;
+        },
+      );
 
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_getCode');
-        expect(params).toEqual([address2Lowercase, 'latest']);
-        return '0x321';
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_getCode');
+          expect(params).toEqual([address2Lowercase, 'latest']);
+          return '0x321';
+        },
+      );
 
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_unsubscribe');
-        expect(params).toEqual(['0x123']);
-        return '0x1';
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_unsubscribe');
+          expect(params).toEqual(['0x123']);
+          return '0x1';
+        },
+      );
 
       const contract = new TestContract(eth);
 
@@ -1671,7 +1848,9 @@ describe('contract', () => {
       const txHash = await sendTx.getTxHash();
       const receipt = await sendTx.getReceipt();
 
-      expect(txHash).toBe('0x5550000000000000000000000000000000000000000000000000000000000032');
+      expect(txHash).toBe(
+        '0x5550000000000000000000000000000000000000000000000000000000000032',
+      );
       expect(receipt.contractAddress).toEqual(address2);
     });
 
@@ -1698,7 +1877,9 @@ describe('contract', () => {
         gasPrice: 3000,
       });
 
-      await expect(sendTx.getReceipt()).rejects.toThrowError('code could not be stored');
+      await expect(sendTx.getReceipt()).rejects.toThrowError(
+        'code could not be stored',
+      );
     });
 
     it('should fail deployment if no contract address in receipt', async () => {
@@ -1708,7 +1889,10 @@ describe('contract', () => {
       );
 
       // eth_getTransactionReceipt
-      mockEthereumProvider.send.mockResolvedValueOnce({ ...txReceipt, contractAddress: undefined });
+      mockEthereumProvider.send.mockResolvedValueOnce({
+        ...txReceipt,
+        contractAddress: undefined,
+      });
 
       // eth_unsubscribe
       mockEthereumProvider.send.mockResolvedValueOnce('0x1');
@@ -1721,34 +1905,44 @@ describe('contract', () => {
         gasPrice: 3000,
       });
 
-      await expect(sendTx.getReceipt()).rejects.toThrowError('contract address');
+      await expect(sendTx.getReceipt()).rejects.toThrowError(
+        'contract address',
+      );
     });
 
     it('should deploy a contract with no ctor', async () => {
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_sendTransaction');
-        expect(params).toEqual([
-          {
-            data: '0x01234567',
-            from: addressLowercase,
-            gas: '0xc350',
-            gasPrice: '0xbb8',
-          },
-        ]);
-        return '0x5550000000000000000000000000000000000000000000000000000000000032';
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_sendTransaction');
+          expect(params).toEqual([
+            {
+              data: '0x01234567',
+              from: addressLowercase,
+              gas: '0xc350',
+              gasPrice: '0xbb8',
+            },
+          ]);
+          return '0x5550000000000000000000000000000000000000000000000000000000000032';
+        },
+      );
 
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_getTransactionReceipt');
-        expect(params).toEqual(['0x5550000000000000000000000000000000000000000000000000000000000032']);
-        return txReceipt;
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_getTransactionReceipt');
+          expect(params).toEqual([
+            '0x5550000000000000000000000000000000000000000000000000000000000032',
+          ]);
+          return txReceipt;
+        },
+      );
 
-      mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
-        expect(method).toBe('eth_getCode');
-        expect(params).toEqual([address2Lowercase, 'latest']);
-        return '0x321';
-      });
+      mockEthereumProvider.send.mockImplementationOnce(
+        async (method, params) => {
+          expect(method).toBe('eth_getCode');
+          expect(params).toEqual([address2Lowercase, 'latest']);
+          return '0x321';
+        },
+      );
 
       const contract = new TestNoCtorContract(eth);
 
@@ -1761,7 +1955,9 @@ describe('contract', () => {
       const txHash = await sendTx.getTxHash();
       const receipt = await sendTx.getReceipt();
 
-      expect(txHash).toBe('0x5550000000000000000000000000000000000000000000000000000000000032');
+      expect(txHash).toBe(
+        '0x5550000000000000000000000000000000000000000000000000000000000032',
+      );
       expect(receipt.contractAddress).toEqual(address2);
     });
   });

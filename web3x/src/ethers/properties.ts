@@ -14,7 +14,11 @@ export function defineReadOnly(object: any, name: string, value: any): void {
 // to ensure types are what we expect.
 
 export function setType(object: any, type: string): void {
-  Object.defineProperty(object, '_ethersType', { configurable: false, value: type, writable: false });
+  Object.defineProperty(object, '_ethersType', {
+    configurable: false,
+    value: type,
+    writable: false,
+  });
 }
 
 export function isType(object: any, type: string): boolean {
@@ -25,11 +29,11 @@ export function resolveProperties(object: any): Promise<any> {
   let result: any = {};
 
   let promises: Array<Promise<void>> = [];
-  Object.keys(object).forEach(key => {
+  Object.keys(object).forEach((key) => {
     let value = object[key];
     if (value instanceof Promise) {
       promises.push(
-        value.then(value => {
+        value.then((value) => {
           result[key] = value;
         }),
       );
@@ -43,7 +47,10 @@ export function resolveProperties(object: any): Promise<any> {
   });
 }
 
-export function checkProperties(object: any, properties: { [name: string]: boolean }): void {
+export function checkProperties(
+  object: any,
+  properties: { [name: string]: boolean },
+): void {
   if (!object || typeof object !== 'object') {
     return errors.throwError('invalid object', errors.INVALID_ARGUMENT, {
       argument: 'object',
@@ -51,13 +58,17 @@ export function checkProperties(object: any, properties: { [name: string]: boole
     });
   }
 
-  Object.keys(object).forEach(key => {
+  Object.keys(object).forEach((key) => {
     if (!properties[key]) {
-      return errors.throwError('invalid object key - ' + key, errors.INVALID_ARGUMENT, {
-        argument: 'transaction',
-        value: object,
-        key: key,
-      });
+      return errors.throwError(
+        'invalid object key - ' + key,
+        errors.INVALID_ARGUMENT,
+        {
+          argument: 'transaction',
+          value: object,
+          key: key,
+        },
+      );
     }
   });
 }
@@ -70,7 +81,11 @@ export function shallowCopy(object: any): any {
   return result;
 }
 
-let opaque: { [key: string]: boolean } = { boolean: true, number: true, string: true };
+let opaque: { [key: string]: boolean } = {
+  boolean: true,
+  number: true,
+  string: true,
+};
 
 export function deepCopy(object: any, frozen?: boolean): any {
   // Opaque objects are not mutable, so safe to copy by assignment
@@ -80,7 +95,7 @@ export function deepCopy(object: any, frozen?: boolean): any {
 
   // Arrays are mutable, so we need to create a copy
   if (Array.isArray(object)) {
-    let result = object.map(item => deepCopy(item, frozen));
+    let result = object.map((item) => deepCopy(item, frozen));
     if (frozen) {
       Object.freeze(result);
     }

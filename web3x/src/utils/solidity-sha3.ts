@@ -24,7 +24,7 @@ import { utf8ToHex } from './hex-utf8';
 import { leftPad, rightPad } from './padding';
 import { sha3 } from './sha3';
 
-const elementaryName = name => {
+const elementaryName = (name) => {
   /*jshint maxcomplexity:false */
 
   if (name.startsWith('int[')) {
@@ -48,18 +48,18 @@ const elementaryName = name => {
 };
 
 // Parse N from type<N>
-const parseTypeN = type => {
+const parseTypeN = (type) => {
   const typesize = /^\D+(\d+).*$/.exec(type);
   return typesize ? parseInt(typesize[1], 10) : null;
 };
 
 // Parse N from type[<N>]
-const parseTypeNArray = type => {
+const parseTypeNArray = (type) => {
   const arraySize = /^\D+\d*\[(\d+)\]$/.exec(type);
   return arraySize ? parseInt(arraySize[1], 10) : null;
 };
 
-const parseNumber = arg => {
+const parseNumber = (arg) => {
   const type = typeof arg;
   if (type === 'string') {
     if (isHexStrict(arg)) {
@@ -101,7 +101,9 @@ const solidityPack = (type, value, arraySize) => {
     }
 
     if (!Address.isAddress(value)) {
-      throw new Error(value + ' is not a valid address, or the checksum is invalid.');
+      throw new Error(
+        value + ' is not a valid address, or the checksum is invalid.',
+      );
     }
 
     return leftPad(value.toLowerCase(), size);
@@ -131,7 +133,9 @@ const solidityPack = (type, value, arraySize) => {
 
     num = parseNumber(value);
     if (num.bitLength() > size) {
-      throw new Error('Supplied uint exceeds width: ' + size + ' vs ' + num.bitLength());
+      throw new Error(
+        'Supplied uint exceeds width: ' + size + ' vs ' + num.bitLength(),
+      );
     }
 
     if (num.lt(new BN(0))) {
@@ -146,7 +150,9 @@ const solidityPack = (type, value, arraySize) => {
 
     num = parseNumber(value);
     if (num.bitLength() > size) {
-      throw new Error('Supplied int exceeds width: ' + size + ' vs ' + num.bitLength());
+      throw new Error(
+        'Supplied int exceeds width: ' + size + ' vs ' + num.bitLength(),
+      );
     }
 
     if (num.lt(new BN(0))) {
@@ -160,7 +166,7 @@ const solidityPack = (type, value, arraySize) => {
   }
 };
 
-const processSoliditySha3Args = arg => {
+const processSoliditySha3Args = (arg) => {
   /*jshint maxcomplexity:false */
 
   if (isArray(arg)) {
@@ -175,7 +181,10 @@ const processSoliditySha3Args = arg => {
   // if type is given
   if (
     isObject(arg) &&
-    (arg.hasOwnProperty('v') || arg.hasOwnProperty('t') || arg.hasOwnProperty('value') || arg.hasOwnProperty('type'))
+    (arg.hasOwnProperty('v') ||
+      arg.hasOwnProperty('t') ||
+      arg.hasOwnProperty('value') ||
+      arg.hasOwnProperty('type'))
   ) {
     type = arg.hasOwnProperty('t') ? arg.t : arg.type;
     value = arg.hasOwnProperty('v') ? arg.v : arg.value;
@@ -190,7 +199,11 @@ const processSoliditySha3Args = arg => {
     }
   }
 
-  if ((type.startsWith('int') || type.startsWith('uint')) && typeof value === 'string' && !/^(-)?0x/i.test(value)) {
+  if (
+    (type.startsWith('int') || type.startsWith('uint')) &&
+    typeof value === 'string' &&
+    !/^(-)?0x/i.test(value)
+  ) {
     value = new BN(value);
   }
 
@@ -198,14 +211,16 @@ const processSoliditySha3Args = arg => {
   if (isArray(value)) {
     arraySize = parseTypeNArray(type);
     if (arraySize && value.length !== arraySize) {
-      throw new Error(type + ' is not matching the given array ' + JSON.stringify(value));
+      throw new Error(
+        type + ' is not matching the given array ' + JSON.stringify(value),
+      );
     } else {
       arraySize = value.length;
     }
   }
 
   if (isArray(value)) {
-    hexArg = value.map(val => {
+    hexArg = value.map((val) => {
       return solidityPack(type, val, arraySize)
         .toString('hex')
         .replace('0x', '');

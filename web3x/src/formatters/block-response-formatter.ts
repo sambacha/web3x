@@ -17,7 +17,13 @@
 
 import { isString } from 'util';
 import { Address } from '../address';
-import { bufferToHex, hexToBuffer, hexToNumber, hexToNumberString, numberToHex } from '../utils';
+import {
+  bufferToHex,
+  hexToBuffer,
+  hexToNumber,
+  hexToNumberString,
+  numberToHex,
+} from '../utils';
 import {
   fromRawTransactionResponse,
   RawTransactionResponse,
@@ -68,14 +74,17 @@ export interface BlockHeaderResponse {
   nonce: Buffer | null;
 }
 
-export interface BlockResponse<T = TransactionResponse | Buffer> extends BlockHeaderResponse {
+export interface BlockResponse<T = TransactionResponse | Buffer>
+  extends BlockHeaderResponse {
   totalDifficulty: string;
   size: number;
   transactions: T[];
   uncles: string[];
 }
 
-export function toRawBlockHeaderResponse(block: BlockHeaderResponse): RawBlockHeaderResponse {
+export function toRawBlockHeaderResponse(
+  block: BlockHeaderResponse,
+): RawBlockHeaderResponse {
   return {
     hash: block.hash ? bufferToHex(block.hash) : null,
     parentHash: bufferToHex(block.parentHash),
@@ -100,12 +109,16 @@ export function toRawBlockResponse(block: BlockResponse): RawBlockResponse {
     ...toRawBlockHeaderResponse(block),
     totalDifficulty: numberToHex(block.totalDifficulty),
     size: numberToHex(block.size)!,
-    transactions: block.transactions.map(tx => (Buffer.isBuffer(tx) ? bufferToHex(tx) : toRawTransactionResponse(tx))),
+    transactions: block.transactions.map((tx) =>
+      Buffer.isBuffer(tx) ? bufferToHex(tx) : toRawTransactionResponse(tx),
+    ),
     uncles: block.uncles,
   };
 }
 
-export function fromRawBlockHeaderResponse(block: RawBlockHeaderResponse): BlockHeaderResponse {
+export function fromRawBlockHeaderResponse(
+  block: RawBlockHeaderResponse,
+): BlockHeaderResponse {
   return {
     hash: block.hash ? hexToBuffer(block.hash) : null,
     parentHash: hexToBuffer(block.parentHash),
@@ -130,7 +143,9 @@ export function fromRawBlockResponse(block: RawBlockResponse): BlockResponse {
     ...fromRawBlockHeaderResponse(block),
     totalDifficulty: hexToNumberString(block.totalDifficulty),
     size: hexToNumber(block.size),
-    transactions: block.transactions.map(tx => (isString(tx) ? hexToBuffer(tx) : fromRawTransactionResponse(tx))),
+    transactions: block.transactions.map((tx) =>
+      isString(tx) ? hexToBuffer(tx) : fromRawTransactionResponse(tx),
+    ),
     uncles: block.uncles,
   };
 }

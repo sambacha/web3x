@@ -15,7 +15,11 @@
   along with web3x.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createJsonRpcBatchPayload, createJsonRpcPayload, isValidJsonRpcResponse } from './jsonrpc';
+import {
+  createJsonRpcBatchPayload,
+  createJsonRpcPayload,
+  isValidJsonRpcResponse,
+} from './jsonrpc';
 
 describe('jsonrpc', () => {
   describe('isValidResponse', () => {

@@ -15,10 +15,14 @@
   along with web3x.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Ws, { ClientOptions } from 'isomorphic-ws';
+import Ws, { ClientOptions } from '@d-fischer/isomorphic-ws';
 import { isArray } from 'util';
 import { JsonRpcRequest } from './jsonrpc';
-import { Callback, LegacyProvider, NotificationCallback } from './legacy-provider';
+import {
+  Callback,
+  LegacyProvider,
+  NotificationCallback,
+} from './legacy-provider';
 import { LegacyProviderAdapter } from './legacy-provider-adapter';
 
 interface WebsocketProviderOptions {
@@ -82,7 +86,7 @@ class LegacyWebsocketProvider implements LegacyProvider {
   private onMessage = (e: any) => {
     const data: string = typeof e.data === 'string' ? e.data : '';
 
-    this.parseResponse(data).forEach(result => {
+    this.parseResponse(data).forEach((result) => {
       let id = null;
 
       // get the id which matches the returned id
@@ -97,8 +101,13 @@ class LegacyWebsocketProvider implements LegacyProvider {
       }
 
       // notification
-      if (!id && result && result.method && result.method.indexOf('_subscription') !== -1) {
-        this.notificationCallbacks.forEach(callback => {
+      if (
+        !id &&
+        result &&
+        result.method &&
+        result.method.indexOf('_subscription') !== -1
+      ) {
+        this.notificationCallbacks.forEach((callback) => {
           callback(result);
         });
 
@@ -121,7 +130,7 @@ class LegacyWebsocketProvider implements LegacyProvider {
       .replace(/\}\][\n\r]?\{/g, '}]|--|{') // }]{
       .split('|--|');
 
-    dechunkedData.forEach(data => {
+    dechunkedData.forEach((data) => {
       // prepend the last chunk
       if (this.lastChunk) {
         data = this.lastChunk + data;
@@ -166,7 +175,10 @@ class LegacyWebsocketProvider implements LegacyProvider {
     if (this.options.timeout) {
       setTimeout(() => {
         if (this.responseCallbacks[id]) {
-          this.responseCallbacks[id].callback(new Error('Connection timeout'), undefined);
+          this.responseCallbacks[id].callback(
+            new Error('Connection timeout'),
+            undefined,
+          );
           delete this.responseCallbacks[id];
         }
       }, this.options.timeout);
@@ -176,7 +188,10 @@ class LegacyWebsocketProvider implements LegacyProvider {
   private timeout() {
     for (const key in this.responseCallbacks) {
       if (this.responseCallbacks[key]) {
-        this.responseCallbacks[key].callback(new Error('Connection error'), undefined);
+        this.responseCallbacks[key].callback(
+          new Error('Connection error'),
+          undefined,
+        );
         delete this.responseCallbacks[key];
       }
     }

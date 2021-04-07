@@ -23,17 +23,28 @@ import { keccak256, keccak256s } from './hash';
 const secp256k1 = new elliptic.ec('secp256k1');
 
 export const create = (entropy: Buffer) => {
-  const innerHex = keccak256(Bytes.concat(Bytes.random(32), '0x' + entropy.toString('hex') || Bytes.random(32)));
-  const middleHex = Bytes.concat(Bytes.concat(Bytes.random(32), innerHex), Bytes.random(32));
+  const innerHex = keccak256(
+    Bytes.concat(
+      Bytes.random(32),
+      '0x' + entropy.toString('hex') || Bytes.random(32),
+    ),
+  );
+  const middleHex = Bytes.concat(
+    Bytes.concat(Bytes.random(32), innerHex),
+    Bytes.random(32),
+  );
   const outerHex = keccak256(middleHex);
   return fromPrivate(Buffer.from(outerHex.slice(2), 'hex'));
 };
 
-export const toChecksum = address => {
+export const toChecksum = (address) => {
   const addressHash = keccak256s(address.slice(2));
   let checksumAddress = '0x';
   for (let i = 0; i < 40; i++)
-    checksumAddress += parseInt(addressHash[i + 2], 16) > 7 ? address[i + 2].toUpperCase() : address[i + 2];
+    checksumAddress +=
+      parseInt(addressHash[i + 2], 16) > 7
+        ? address[i + 2].toUpperCase()
+        : address[i + 2];
   return checksumAddress;
 };
 
@@ -49,7 +60,8 @@ export const fromPrivate = (privateKey: Buffer) => {
   };
 };
 
-export const encodeSignature = ([v, r, s]) => Bytes.flatten([Bytes.pad(32, r), Bytes.pad(32, s), v]);
+export const encodeSignature = ([v, r, s]) =>
+  Bytes.flatten([Bytes.pad(32, r), Bytes.pad(32, s), v]);
 
 export const decodeSignature = (hex: string) => [
   Bytes.slice(64, Bytes.length(hex), hex),
@@ -57,8 +69,10 @@ export const decodeSignature = (hex: string) => [
   Bytes.slice(32, 64, hex),
 ];
 
-export const makeSigner = addToV => (hash, privateKey: Buffer) => {
-  const signature = secp256k1.keyFromPrivate(privateKey).sign(Buffer.from(hash.slice(2), 'hex'), { canonical: true });
+export const makeSigner = (addToV) => (hash, privateKey: Buffer) => {
+  const signature = secp256k1
+    .keyFromPrivate(privateKey)
+    .sign(Buffer.from(hash.slice(2), 'hex'), { canonical: true });
   return encodeSignature([
     Nat.fromString(Bytes.fromNumber(addToV + signature.recoveryParam)),
     Bytes.pad(32, Bytes.fromNat('0x' + signature.r.toString(16))),
@@ -70,7 +84,11 @@ export const sign = makeSigner(27); // v=27|28 instead of 0|1...
 
 export const recover = (hash, signature) => {
   const vals = decodeSignature(signature);
-  const vrs = { v: Bytes.toNumber(vals[0]), r: vals[1].slice(2), s: vals[2].slice(2) };
+  const vrs = {
+    v: Bytes.toNumber(vals[0]),
+    r: vals[1].slice(2),
+    s: vals[2].slice(2),
+  };
   const ecPublicKey = secp256k1.recoverPubKey(
     Buffer.from(hash.slice(2), 'hex'),
     vrs,
@@ -82,4 +100,13 @@ export const recover = (hash, signature) => {
   return address;
 };
 
-export default { create, toChecksum, fromPrivate, sign, makeSigner, recover, encodeSignature, decodeSignature };
+export default {
+  create,
+  toChecksum,
+  fromPrivate,
+  sign,
+  makeSigner,
+  recover,
+  encodeSignature,
+  decodeSignature,
+};

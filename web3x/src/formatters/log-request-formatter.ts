@@ -48,8 +48,8 @@ export function toRawLogRequest(logRequest: LogRequest = {}): RawLogRequest {
   }
 
   // Convert topics to hex.
-  rawLogRequest.topics = (logRequest.topics || []).map(topic => {
-    const toTopic = value => {
+  rawLogRequest.topics = (logRequest.topics || []).map((topic) => {
+    const toTopic = (value) => {
       if (value === null || typeof value === 'undefined') {
         return null;
       }
@@ -61,7 +61,7 @@ export function toRawLogRequest(logRequest: LogRequest = {}): RawLogRequest {
 
   if (logRequest.address) {
     rawLogRequest.address = isArray(logRequest.address)
-      ? logRequest.address.map(a => a.toString().toLowerCase())
+      ? logRequest.address.map((a) => a.toString().toLowerCase())
       : logRequest.address.toString().toLowerCase();
   }
 
@@ -73,7 +73,11 @@ export function fromRawLogRequest(rawLogRequest: RawLogRequest): LogRequest {
   return {
     toBlock: toBlock ? hexToNumber(toBlock) : undefined,
     fromBlock: fromBlock ? hexToNumber(fromBlock) : undefined,
-    address: address ? (isArray(address) ? address.map(Address.fromString) : Address.fromString(address)) : undefined,
+    address: address
+      ? isArray(address)
+        ? address.map(Address.fromString)
+        : Address.fromString(address)
+      : undefined,
     topics,
   };
 }

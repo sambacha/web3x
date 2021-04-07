@@ -25,17 +25,21 @@
 // | 192 to 247 | HEX(length_of_node + 192) + HEX(node)                                      |
 // | 248 to 255 | HEX(length_of_length_of_node + 128 + 55) + HEX(length_of_node) + HEX(node) |
 
-export const encode = tree => {
-  const padEven = str => (str.length % 2 === 0 ? str : '0' + str);
+export const encode = (tree) => {
+  const padEven = (str) => (str.length % 2 === 0 ? str : '0' + str);
 
-  const uint = num => padEven(num.toString(16));
+  const uint = (num) => padEven(num.toString(16));
 
-  const length = (len, add) => (len < 56 ? uint(add + len) : uint(add + uint(len).length / 2 + 55) + uint(len));
+  const length = (len, add) =>
+    len < 56
+      ? uint(add + len)
+      : uint(add + uint(len).length / 2 + 55) + uint(len);
 
-  const dataTree = tree => {
+  const dataTree = (tree) => {
     if (typeof tree === 'string') {
       const hex = tree.slice(2);
-      const pre = hex.length != 2 || hex >= '80' ? length(hex.length / 2, 128) : '';
+      const pre =
+        hex.length != 2 || hex >= '80' ? length(hex.length / 2, 128) : '';
       return pre + hex;
     } else {
       const hex = tree.map(dataTree).join('');
@@ -53,7 +57,11 @@ export const decode = (hex: string): any => {
   const parseTree = () => {
     if (i >= hex.length) throw '';
     const head = hex.slice(i, i + 2);
-    return head < '80' ? ((i += 2), '0x' + head) : head < 'c0' ? parseHex() : parseList();
+    return head < '80'
+      ? ((i += 2), '0x' + head)
+      : head < 'c0'
+      ? parseHex()
+      : parseList();
   };
 
   const parseLength = () => {

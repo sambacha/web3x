@@ -22,7 +22,11 @@ import { TransactionHash } from '../types';
 import { ContractAbi } from './abi';
 
 export class SentContractTx extends SentTransaction {
-  constructor(eth: Eth, protected contractAbi: ContractAbi, promise: Promise<TransactionHash>) {
+  constructor(
+    eth: Eth,
+    protected contractAbi: ContractAbi,
+    promise: Promise<TransactionHash>,
+  ) {
     super(eth, promise);
   }
 
@@ -34,7 +38,9 @@ export class SentContractTx extends SentTransaction {
       return receipt;
     }
 
-    const isAnonymous = log => !log.address.equals(contractAddress) || !this.contractAbi.findEntryForLog(log);
+    const isAnonymous = (log) =>
+      !log.address.equals(contractAddress) ||
+      !this.contractAbi.findEntryForLog(log);
 
     const anonymousLogs = logs.filter(isAnonymous);
 

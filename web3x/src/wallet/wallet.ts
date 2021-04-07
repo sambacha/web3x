@@ -48,13 +48,19 @@ export class Wallet {
     return wallet;
   }
 
-  public static async fromKeystores(encryptedWallet: KeyStore[], password: string) {
+  public static async fromKeystores(
+    encryptedWallet: KeyStore[],
+    password: string,
+  ) {
     const wallet = new Wallet();
     await wallet.decrypt(encryptedWallet, password);
     return wallet;
   }
 
-  public static async fromLocalStorage(password: string, keyName: string = DEFAULT_KEY_NAME) {
+  public static async fromLocalStorage(
+    password: string,
+    keyName: string = DEFAULT_KEY_NAME,
+  ) {
     if (!localStorage) {
       return;
     }
@@ -83,18 +89,29 @@ export class Wallet {
     if (isNumber(addressOrIndex)) {
       return this.accounts[addressOrIndex];
     }
-    return this.accounts.find(a => a && a.address.toString().toLowerCase() === addressOrIndex.toString().toLowerCase());
+    return this.accounts.find(
+      (a) =>
+        a &&
+        a.address.toString().toLowerCase() ===
+          addressOrIndex.toString().toLowerCase(),
+    );
   }
 
   public indexOf(addressOrIndex: string | number | Address) {
     if (isNumber(addressOrIndex)) {
       return addressOrIndex;
     }
-    return this.accounts.findIndex(a => a.address.toString().toLowerCase() === addressOrIndex.toString().toLowerCase());
+    return this.accounts.findIndex(
+      (a) =>
+        a.address.toString().toLowerCase() ===
+        addressOrIndex.toString().toLowerCase(),
+    );
   }
 
   public add(accountOrKey: Buffer | Account): Account {
-    const account = Buffer.isBuffer(accountOrKey) ? Account.fromPrivate(accountOrKey) : accountOrKey;
+    const account = Buffer.isBuffer(accountOrKey)
+      ? Account.fromPrivate(accountOrKey)
+      : accountOrKey;
 
     const existing = this.get(account.address);
     if (existing) {
@@ -127,12 +144,18 @@ export class Wallet {
   }
 
   public encrypt(password: string, options?) {
-    return Promise.all(this.currentIndexes().map(index => this.accounts[index].encrypt(password, options)));
+    return Promise.all(
+      this.currentIndexes().map((index) =>
+        this.accounts[index].encrypt(password, options),
+      ),
+    );
   }
 
   public async decrypt(encryptedWallet: KeyStore[], password: string) {
-    const decrypted = await Promise.all(encryptedWallet.map(keystore => decrypt(keystore, password)));
-    decrypted.forEach(account => {
+    const decrypted = await Promise.all(
+      encryptedWallet.map((keystore) => decrypt(keystore, password)),
+    );
+    decrypted.forEach((account) => {
       if (!account) {
         throw new Error("Couldn't decrypt accounts. Password wrong?");
       }
@@ -143,7 +166,10 @@ export class Wallet {
     return this.accounts;
   }
 
-  public async saveToLocalStorage(password: string, keyName: string = DEFAULT_KEY_NAME) {
+  public async saveToLocalStorage(
+    password: string,
+    keyName: string = DEFAULT_KEY_NAME,
+  ) {
     if (!localStorage) {
       return false;
     }
@@ -161,7 +187,7 @@ export class Wallet {
   }
 
   public currentIndexes() {
-    return Object.keys(this.accounts).map(key => +key);
+    return Object.keys(this.accounts).map((key) => +key);
   }
 
   public currentAddresses() {

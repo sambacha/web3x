@@ -18,7 +18,8 @@
 import { EventEmitter } from 'events';
 import { EthereumProvider } from './ethereum-provider';
 
-export class MockEthereumProvider extends EventEmitter implements EthereumProvider {
+export class MockEthereumProvider extends EventEmitter
+  implements EthereumProvider {
   public send = jest.fn();
 
   constructor() {

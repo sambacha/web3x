@@ -101,7 +101,9 @@ export function fromWei(num: string | BN, unit: keyof typeof unitMap) {
   unit = getUnitValue(unit);
 
   if (!isBN(num) && !isString(num)) {
-    throw new Error('Please pass numbers as strings or BigNumber objects to avoid precision errors.');
+    throw new Error(
+      'Please pass numbers as strings or BigNumber objects to avoid precision errors.',
+    );
   }
 
   return isBN(num) ? new BN(ethjsFromWei(num, unit)) : ethjsFromWei(num, unit);
@@ -135,7 +137,9 @@ export function toWei(num: string | BN, unit: keyof typeof unitMap) {
   unit = getUnitValue(unit);
 
   if (!isBN(num) && !isString(num)) {
-    throw new Error('Please pass numbers as strings or BigNumber objects to avoid precision errors.');
+    throw new Error(
+      'Please pass numbers as strings or BigNumber objects to avoid precision errors.',
+    );
   }
 
   return isBN(num) ? ethjsToWei(num, unit) : ethjsToWei(num, unit).toString(10);
@@ -176,7 +180,11 @@ function numberToString(arg) {
     return arg;
   } else if (typeof arg === 'number') {
     return String(arg);
-  } else if (typeof arg === 'object' && arg.toString && (arg.toTwos || arg.dividedToIntegerBy)) {
+  } else if (
+    typeof arg === 'object' &&
+    arg.toString &&
+    (arg.toTwos || arg.dividedToIntegerBy)
+  ) {
     if (arg.toPrecision) {
       return String(arg.toPrecision());
     } else {
@@ -184,7 +192,9 @@ function numberToString(arg) {
       return arg.toString(10);
     }
   }
-  throw new Error(`while converting number to string, invalid number value '${arg}' type ${typeof arg}.`);
+  throw new Error(
+    `while converting number to string, invalid number value '${arg}' type ${typeof arg}.`,
+  );
 }
 
 function ethjsFromWei(weiInput, unit, optionsInput?) {
@@ -235,13 +245,17 @@ function ethjsToWei(etherInput, unit) {
   }
 
   if (ether === '.') {
-    throw new Error(`[ethjs-unit] while converting number ${etherInput} to wei, invalid value`);
+    throw new Error(
+      `[ethjs-unit] while converting number ${etherInput} to wei, invalid value`,
+    );
   }
 
   // Split it into a whole and fractional part
   const comps = ether.split('.'); // eslint-disable-line
   if (comps.length > 2) {
-    throw new Error(`[ethjs-unit] while converting number ${etherInput} to wei,  too many decimal points`);
+    throw new Error(
+      `[ethjs-unit] while converting number ${etherInput} to wei,  too many decimal points`,
+    );
   }
 
   let whole = comps[0];
@@ -254,7 +268,9 @@ function ethjsToWei(etherInput, unit) {
     fraction = '0';
   }
   if (fraction.length > baseLength) {
-    throw new Error(`[ethjs-unit] while converting number ${etherInput} to wei, too many decimal places`);
+    throw new Error(
+      `[ethjs-unit] while converting number ${etherInput} to wei, too many decimal places`,
+    );
   }
 
   while (fraction.length < baseLength) {

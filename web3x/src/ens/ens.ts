@@ -73,9 +73,15 @@ export class ENS {
    * @param {function} callback
    * @returns {eventifiedPromise}
    */
-  public async setAddress(name: string, address: Address, sendOptions: SendOptions) {
+  public async setAddress(
+    name: string,
+    address: Address,
+    sendOptions: SendOptions,
+  ) {
     const resolver = await this.registry.resolver(name);
-    return await resolver.methods.setAddr(namehash(name), address).send(sendOptions);
+    return await resolver.methods
+      .setAddr(namehash(name), address)
+      .send(sendOptions);
   }
 
   /**
@@ -102,9 +108,16 @@ export class ENS {
    * @param {function} callback
    * @returns {eventifiedPromise}
    */
-  public async setPubkey(name: string, x: string, y: string, sendOptions: SendOptions) {
+  public async setPubkey(
+    name: string,
+    x: string,
+    y: string,
+    sendOptions: SendOptions,
+  ) {
     const resolver = await this.registry.resolver(name);
-    return await resolver.methods.setPubkey(namehash(name), x, y).send(sendOptions);
+    return await resolver.methods
+      .setPubkey(namehash(name), x, y)
+      .send(sendOptions);
   }
 
   /**
@@ -130,9 +143,15 @@ export class ENS {
    * @param {Object} sendOptions
    * @returns {eventifiedPromise}
    */
-  public async setContent(name: string, hash: string, sendOptions: SendOptions) {
+  public async setContent(
+    name: string,
+    hash: string,
+    sendOptions: SendOptions,
+  ) {
     const resolver = await this.registry.resolver(name);
-    return await resolver.methods.setContent(namehash(name), hash).send(sendOptions);
+    return await resolver.methods
+      .setContent(namehash(name), hash)
+      .send(sendOptions);
   }
 
   /**
@@ -158,9 +177,15 @@ export class ENS {
    * @param {function} callback
    * @returns {eventifiedPromise}
    */
-  public async setMultihash(name: string, hash: string, sendOptions: SendOptions) {
+  public async setMultihash(
+    name: string,
+    hash: string,
+    sendOptions: SendOptions,
+  ) {
     const resolver = await this.registry.resolver(name);
-    return await resolver.methods.setMultihash(namehash(name), hash).send(sendOptions);
+    return await resolver.methods
+      .setMultihash(namehash(name), hash)
+      .send(sendOptions);
   }
 
   /**
@@ -173,7 +198,9 @@ export class ENS {
     const block = await this.eth.getBlock('latest');
     const headAge = new Date().getTime() / 1000 - block.timestamp;
     if (headAge > 3600) {
-      throw new Error('Network not synced; last block was ' + headAge + ' seconds ago');
+      throw new Error(
+        'Network not synced; last block was ' + headAge + ' seconds ago',
+      );
     }
     const networkType = await this.net.getNetworkType();
     const addr: string = config.addresses[networkType];

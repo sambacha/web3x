@@ -67,7 +67,10 @@ function ibanChecksum(address: string): string {
 
 export function getAddress(address: string): Address {
   if (typeof address !== 'string') {
-    errors.throwError('invalid address', errors.INVALID_ARGUMENT, { arg: 'address', value: address });
+    errors.throwError('invalid address', errors.INVALID_ARGUMENT, {
+      arg: 'address',
+      value: address,
+    });
   }
 
   if (address.match(/^(0x)?[0-9a-fA-F]{40}$/)) {
@@ -82,7 +85,10 @@ export function getAddress(address: string): Address {
   } else if (address.match(/^XE[0-9]{2}[0-9A-Za-z]{30,31}$/)) {
     // It is an ICAP address with a bad checksum
     if (address.substring(2, 4) !== ibanChecksum(address)) {
-      errors.throwError('bad icap checksum', errors.INVALID_ARGUMENT, { arg: 'address', value: address });
+      errors.throwError('bad icap checksum', errors.INVALID_ARGUMENT, {
+        arg: 'address',
+        value: address,
+      });
     }
 
     let result = new BN(address.substring(4), 36).toString(16);
@@ -91,12 +97,17 @@ export function getAddress(address: string): Address {
     }
     return Address.fromString(result);
   } else {
-    return errors.throwError('invalid address', errors.INVALID_ARGUMENT, { arg: 'address', value: address });
+    return errors.throwError('invalid address', errors.INVALID_ARGUMENT, {
+      arg: 'address',
+      value: address,
+    });
   }
 }
 
 export function getIcapAddress(address: string): string {
-  var base36 = new BN(Address.fromString(address).toBuffer()).toString(36).toUpperCase();
+  var base36 = new BN(Address.fromString(address).toBuffer())
+    .toString(36)
+    .toUpperCase();
   while (base36.length < 30) {
     base36 = '0' + base36;
   }
@@ -104,11 +115,19 @@ export function getIcapAddress(address: string): string {
 }
 
 // http://ethereum.stackexchange.com/questions/760/how-is-the-address-of-an-ethereum-contract-computed
-export function getContractAddress(transaction: { from: string; nonce: Arrayish | BigNumber | number }) {
+export function getContractAddress(transaction: {
+  from: string;
+  nonce: Arrayish | BigNumber | number;
+}) {
   if (!transaction.from) {
     throw new Error('missing from address');
   }
   var nonce = transaction.nonce;
 
-  return getAddress('0x' + keccak256(encode([getAddress(transaction.from), stripZeros(hexlify(nonce))])).substring(26));
+  return getAddress(
+    '0x' +
+      keccak256(
+        encode([getAddress(transaction.from), stripZeros(hexlify(nonce))]),
+      ).substring(26),
+  );
 }

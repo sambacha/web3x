@@ -52,10 +52,15 @@ function testBytes(bloom, bytes: string) {
 
   for (let i = 0; i < 12; i += 4) {
     // calculate bit position in bloom filter that must be active
-    const bitpos = ((parseInt(hash.substr(i, 2), 16) << 8) + parseInt(hash.substr(i + 2, 2), 16)) & 2047;
+    const bitpos =
+      ((parseInt(hash.substr(i, 2), 16) << 8) +
+        parseInt(hash.substr(i + 2, 2), 16)) &
+      2047;
 
     // test if bitpos in bloom is active
-    const code = codePointToInt(bloom.charCodeAt(bloom.length - 1 - Math.floor(bitpos / 4)));
+    const code = codePointToInt(
+      bloom.charCodeAt(bloom.length - 1 - Math.floor(bitpos / 4)),
+    );
     const offset = 1 << bitpos % 4;
 
     if ((code & offset) !== offset) {
@@ -118,7 +123,10 @@ export let testTopic = (bloom: string, topic: string) => {
 export let isBloom = (bloom: string) => {
   if (!/^(0x)?[0-9a-f]{512}$/i.test(bloom)) {
     return false;
-  } else if (/^(0x)?[0-9a-f]{512}$/.test(bloom) || /^(0x)?[0-9A-F]{512}$/.test(bloom)) {
+  } else if (
+    /^(0x)?[0-9a-f]{512}$/.test(bloom) ||
+    /^(0x)?[0-9A-F]{512}$/.test(bloom)
+  ) {
     return true;
   }
   return false;

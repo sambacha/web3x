@@ -1,6 +1,13 @@
 import { EventEmitter } from 'events';
-import { EthereumProvider, EthereumProviderNotifications } from './ethereum-provider';
-import { createJsonRpcPayload, isValidJsonRpcResponse, JsonRpcResponse } from './jsonrpc';
+import {
+  EthereumProvider,
+  EthereumProviderNotifications,
+} from './ethereum-provider';
+import {
+  createJsonRpcPayload,
+  isValidJsonRpcResponse,
+  JsonRpcResponse,
+} from './jsonrpc';
 import { LegacyProvider } from './legacy-provider';
 
 export class LegacyProviderAdapter implements EthereumProvider {
@@ -43,11 +50,19 @@ export class LegacyProviderAdapter implements EthereumProvider {
         const response = message as JsonRpcResponse;
 
         if (response.error) {
-          const message = response.error.message ? response.error.message : JSON.stringify(response);
+          const message = response.error.message
+            ? response.error.message
+            : JSON.stringify(response);
           return reject(new Error('Returned error: ' + message));
         }
         if (response.id && payload.id !== response.id) {
-          return reject(new Error(`Wrong response id ${payload.id} != ${response.id} in ${JSON.stringify(payload)}`));
+          return reject(
+            new Error(
+              `Wrong response id ${payload.id} != ${
+                response.id
+              } in ${JSON.stringify(payload)}`,
+            ),
+          );
         }
 
         resolve(response.result);
@@ -55,12 +70,27 @@ export class LegacyProviderAdapter implements EthereumProvider {
     });
   }
 
-  public on(notification: 'notification', listener: (result: any) => void): this;
+  public on(
+    notification: 'notification',
+    listener: (result: any) => void,
+  ): this;
   public on(notification: 'connect', listener: () => void): this;
-  public on(notification: 'close', listener: (code: number, reason: string) => void): this;
-  public on(notification: 'networkChanged', listener: (networkId: string) => void): this;
-  public on(notification: 'accountsChanged', listener: (accounts: string[]) => void): this;
-  public on(notification: EthereumProviderNotifications, listener: (...args: any[]) => void): this {
+  public on(
+    notification: 'close',
+    listener: (code: number, reason: string) => void,
+  ): this;
+  public on(
+    notification: 'networkChanged',
+    listener: (networkId: string) => void,
+  ): this;
+  public on(
+    notification: 'accountsChanged',
+    listener: (accounts: string[]) => void,
+  ): this;
+  public on(
+    notification: EthereumProviderNotifications,
+    listener: (...args: any[]) => void,
+  ): this {
     if (notification !== 'notification') {
       throw new Error('Legacy providers only support notification event.');
     }
@@ -71,12 +101,27 @@ export class LegacyProviderAdapter implements EthereumProvider {
     return this;
   }
 
-  public removeListener(notification: 'notification', listener: (result: any) => void): this;
+  public removeListener(
+    notification: 'notification',
+    listener: (result: any) => void,
+  ): this;
   public removeListener(notification: 'connect', listener: () => void): this;
-  public removeListener(notification: 'close', listener: (code: number, reason: string) => void): this;
-  public removeListener(notification: 'networkChanged', listener: (networkId: string) => void): this;
-  public removeListener(notification: 'accountsChanged', listener: (accounts: string[]) => void): this;
-  public removeListener(notification: EthereumProviderNotifications, listener: (...args: any[]) => void): this {
+  public removeListener(
+    notification: 'close',
+    listener: (code: number, reason: string) => void,
+  ): this;
+  public removeListener(
+    notification: 'networkChanged',
+    listener: (networkId: string) => void,
+  ): this;
+  public removeListener(
+    notification: 'accountsChanged',
+    listener: (accounts: string[]) => void,
+  ): this;
+  public removeListener(
+    notification: EthereumProviderNotifications,
+    listener: (...args: any[]) => void,
+  ): this {
     if (!this.provider.removeListener) {
       throw new Error('Legacy provider does not support subscriptions.');
     }

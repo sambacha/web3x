@@ -49,7 +49,7 @@ class LegacyIpcProvider implements LegacyProvider {
 
       // get the id which matches the returned id
       if (isArray(result)) {
-        result.forEach(load => {
+        result.forEach((load) => {
           if (this.responseCallbacks[load.id]) {
             id = load.id;
           }
@@ -60,7 +60,7 @@ class LegacyIpcProvider implements LegacyProvider {
 
       // notification
       if (!id && result.method.indexOf('_subscription') !== -1) {
-        this.notificationCallbacks.forEach(callback => {
+        this.notificationCallbacks.forEach((callback) => {
           if (isFunction(callback)) {
             callback(result);
           }
@@ -73,7 +73,7 @@ class LegacyIpcProvider implements LegacyProvider {
       }
     };
 
-    this.connection.on('data', data => {
+    this.connection.on('data', (data) => {
       this._parseResponse(data.toString()).forEach(callback);
     });
   }
@@ -111,7 +111,7 @@ class LegacyIpcProvider implements LegacyProvider {
       .replace(/\}\][\n\r]?\{/g, '}]|--|{') // }]{
       .split('|--|');
 
-    dechunkedData.forEach(data => {
+    dechunkedData.forEach((data) => {
       // prepend the last chunk
       if (this.lastChunk) {
         data = this.lastChunk + data;
@@ -157,7 +157,9 @@ class LegacyIpcProvider implements LegacyProvider {
   private _timeout() {
     for (const key in this.responseCallbacks) {
       if (this.responseCallbacks.hasOwnProperty(key)) {
-        this.responseCallbacks[key](new Error(`CONNECTION ERROR: Couldn't connect to node on IPC.`));
+        this.responseCallbacks[key](
+          new Error(`CONNECTION ERROR: Couldn't connect to node on IPC.`),
+        );
         delete this.responseCallbacks[key];
       }
     }

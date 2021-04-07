@@ -62,7 +62,9 @@ export async function decrypt(
     throw new Error('No password given.');
   }
 
-  const json = !isString(v3Keystore) ? v3Keystore : JSON.parse(nonStrict ? v3Keystore.toLowerCase() : v3Keystore);
+  const json = !isString(v3Keystore)
+    ? v3Keystore
+    : JSON.parse(nonStrict ? v3Keystore.toLowerCase() : v3Keystore);
 
   if (json.version !== 3) {
     throw new Error('Not a valid V3 wallet');
@@ -73,7 +75,14 @@ export async function decrypt(
   if (json.crypto.kdf === 'scrypt') {
     const { n, r, p, dklen, salt } = json.crypto.kdfparams;
 
-    derivedKey = await scrypt(Buffer.from(password), Buffer.from(salt, 'hex'), n, r, p, dklen);
+    derivedKey = await scrypt(
+      Buffer.from(password),
+      Buffer.from(salt, 'hex'),
+      n,
+      r,
+      p,
+      dklen,
+    );
   } else if (json.crypto.kdf === 'pbkdf2') {
     const { prf, c, dklen, salt } = json.crypto.kdfparams;
 
@@ -81,14 +90,21 @@ export async function decrypt(
       throw new Error('Unsupported parameters to PBKDF2');
     }
 
-    derivedKey = await pbkdf2(Buffer.from(password), Buffer.from(salt, 'hex'), c, dklen);
+    derivedKey = await pbkdf2(
+      Buffer.from(password),
+      Buffer.from(salt, 'hex'),
+      c,
+      dklen,
+    );
   } else {
     throw new Error('Unsupported key derivation scheme');
   }
 
   const ciphertext = Buffer.from(json.crypto.ciphertext, 'hex');
 
-  const mac = sha3(Buffer.concat([derivedKey.slice(16, 32), ciphertext])).replace('0x', '');
+  const mac = sha3(
+    Buffer.concat([derivedKey.slice(16, 32), ciphertext]),
+  ).replace('0x', '');
   if (mac !== json.crypto.mac) {
     throw new Error('Key derivation failed - possibly wrong password');
   }
@@ -107,7 +123,9 @@ export async function encrypt(
   options: any = {},
 ): Promise<KeyStore> {
   const cipherAlgo = options.cipher || 'aes-128-ctr';
-  const salt: Buffer = options.salt ? Buffer.from(options.salt, 'hex') : randomBytes(32);
+  const salt: Buffer = options.salt
+    ? Buffer.from(options.salt, 'hex')
+    : randomBytes(32);
   const iv = options.iv ? Buffer.from(options.iv, 'hex') : randomBytes(16);
   const kdf = options.kdf || 'scrypt';
   const id = options.id || uuid.v4({ random: options.uuid || randomBytes(16) });
@@ -141,7 +159,9 @@ export async function encrypt(
 
   const ciphertext = Buffer.concat([cipher.update(privateKey), cipher.final()]);
 
-  const mac = sha3(Buffer.concat([derivedKey.slice(16, 32), ciphertext])).replace('0x', '');
+  const mac = sha3(
+    Buffer.concat([derivedKey.slice(16, 32), ciphertext]),
+  ).replace('0x', '');
 
   return {
     version: 3,

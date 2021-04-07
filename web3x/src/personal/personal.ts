@@ -17,14 +17,25 @@
 
 import { Address } from '../address';
 import { EthereumProvider } from '../providers/ethereum-provider';
-import { PersonalRequestPayloads, Transaction } from './personal-request-payloads';
+import {
+  PersonalRequestPayloads,
+  Transaction,
+} from './personal-request-payloads';
 
 export class Personal {
   public readonly request = new PersonalRequestPayloads();
 
   constructor(private provider: EthereumProvider) {}
 
-  private async send<T>({ method, params, format }: { method: string; params?: any[]; format: (x: any) => T }) {
+  private async send<T>({
+    method,
+    params,
+    format,
+  }: {
+    method: string;
+    params?: any[];
+    format: (x: any) => T;
+  }) {
     return format(await this.provider.send(method, params));
   }
 
@@ -38,7 +49,11 @@ export class Personal {
     return await this.send(payload);
   }
 
-  public async unlockAccount(address: Address, password: string, duration: number) {
+  public async unlockAccount(
+    address: Address,
+    password: string,
+    duration: number,
+  ) {
     const payload = this.request.unlockAccount(address, password, duration);
     return await this.send(payload);
   }

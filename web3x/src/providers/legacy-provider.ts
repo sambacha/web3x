@@ -22,7 +22,10 @@ import { JsonRpcRequest, JsonRpcResponse } from './jsonrpc';
 
 export type Callback = (err?: Error, result?: JsonRpcResponse) => void;
 
-export type NotificationCallback = (result: any, deprecatedResult?: any) => void;
+export type NotificationCallback = (
+  result: any,
+  deprecatedResult?: any,
+) => void;
 
 export interface LegacyProvider {
   send(payload: JsonRpcRequest, callback: Callback): any;

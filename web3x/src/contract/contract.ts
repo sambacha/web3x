@@ -17,7 +17,14 @@
 
 import { Address } from '../address';
 import { Eth } from '../eth';
-import { EventLog, fromRawLogResponse, LogRequest, LogResponse, RawLogResponse, toRawLogRequest } from '../formatters';
+import {
+  EventLog,
+  fromRawLogResponse,
+  LogRequest,
+  LogResponse,
+  RawLogResponse,
+  toRawLogRequest,
+} from '../formatters';
 import { Subscription } from '../subscriptions';
 import { Data } from '../types';
 import { hexToBuffer } from '../utils';
@@ -39,21 +46,30 @@ interface ContractDefinition {
 
 export type EventSubscriptionFactory<Result = EventLog<any>> = (
   options?: object,
-  callback?: (err: Error, result: Result, subscription: Subscription<Result>) => void,
+  callback?: (
+    err: Error,
+    result: Result,
+    subscription: Subscription<Result>,
+  ) => void,
 ) => Subscription<Result>;
 
 type Events<T extends ContractDefinition | void> = T extends ContractDefinition
   ? Extract<keyof T['events'], string>
   : string;
 
-type GetEventLog<T extends ContractDefinition | void, P extends Events<T>> = T extends ContractDefinition
-  ? T['eventLogs'][P]
-  : EventLog<any>;
+type GetEventLog<
+  T extends ContractDefinition | void,
+  P extends Events<T>
+> = T extends ContractDefinition ? T['eventLogs'][P] : EventLog<any>;
 
-type GetContractMethods<T> = T extends ContractDefinition ? T['methods'] : { [key: string]: (...args: any[]) => Tx };
+type GetContractMethods<T> = T extends ContractDefinition
+  ? T['methods']
+  : { [key: string]: (...args: any[]) => Tx };
 
 type GetContractEvents<T> = T extends ContractDefinition
-  ? T['events'] & { allEvents: EventSubscriptionFactory<T['eventLogs'][Events<T>]> }
+  ? T['events'] & {
+      allEvents: EventSubscriptionFactory<T['eventLogs'][Events<T>]>;
+    }
   : { [key: string]: EventSubscriptionFactory };
 
 /**
@@ -108,7 +124,7 @@ export class Contract<T extends ContractDefinition | void = void> {
       hexToBuffer(linkedData),
       args,
       this.defaultOptions,
-      addr => (this.address = addr),
+      (addr) => (this.address = addr),
     );
   }
 
@@ -120,7 +136,11 @@ export class Contract<T extends ContractDefinition | void = void> {
     },
     callback: (err, res: GetEventLog<T, Event>, sub) => void,
   );
-  public once(event: Events<T>, options: LogRequest, callback: (err, res, sub) => void): void {
+  public once(
+    event: Events<T>,
+    options: LogRequest,
+    callback: (err, res, sub) => void,
+  ): void {
     this.on(event, options, (err, res, sub) => {
       sub.unsubscribe();
       callback(err, res, sub);
@@ -131,14 +151,24 @@ export class Contract<T extends ContractDefinition | void = void> {
     event: Event,
     options: LogRequest,
   ): Promise<GetEventLog<T, Event>[]>;
-  public async getPastEvents(event: 'allevents', options: LogRequest): Promise<EventLog<any>[]>;
-  public async getPastEvents(event: Events<T> & 'allevents', options: LogRequest = {}): Promise<EventLog<any>[]> {
+  public async getPastEvents(
+    event: 'allevents',
+    options: LogRequest,
+  ): Promise<EventLog<any>[]>;
+  public async getPastEvents(
+    event: Events<T> & 'allevents',
+    options: LogRequest = {},
+  ): Promise<EventLog<any>[]> {
     const logOptions = this.getLogOptions(event, options);
     const result = await this.eth.getPastLogs(logOptions);
-    return result.map(log => this.contractAbi.decodeEvent(log));
+    return result.map((log) => this.contractAbi.decodeEvent(log));
   }
 
-  private on(event: string, options: LogRequest = {}, callback?: (err, res, sub) => void) {
+  private on(
+    event: string,
+    options: LogRequest = {},
+    callback?: (err, res, sub) => void,
+  ) {
     const logOptions = this.getLogOptions(event, options);
     const { fromBlock, ...subLogOptions } = logOptions;
     const params = [toRawLogRequest(subLogOptions)];
@@ -159,7 +189,7 @@ export class Contract<T extends ContractDefinition | void = void> {
       false,
     );
 
-    subscription.on('error', err => {
+    subscription.on('error', (err) => {
       if (callback) {
         callback(err, undefined, subscription);
       }
@@ -168,14 +198,14 @@ export class Contract<T extends ContractDefinition | void = void> {
     if (fromBlock !== undefined) {
       this.eth
         .getPastLogs(logOptions)
-        .then(logs => {
-          logs.forEach(result => {
+        .then((logs) => {
+          logs.forEach((result) => {
             const output = this.contractAbi.decodeEvent(result);
             subscription.emit('data', output);
           });
           subscription.subscribe();
         })
-        .catch(err => {
+        .catch((err) => {
           subscription.emit('error', err);
         });
     } else {
@@ -191,32 +221,40 @@ export class Contract<T extends ContractDefinition | void = void> {
         throw new Error('No contract address.');
       }
 
-      const firstMatchingOverload = functions.find(f => args.length === f.numArgs());
+      const firstMatchingOverload = functions.find(
+        (f) => args.length === f.numArgs(),
+      );
 
       if (!firstMatchingOverload) {
-        throw new Error(`No matching method with ${args.length} arguments for ${functions[0].name}.`);
+        throw new Error(
+          `No matching method with ${args.length} arguments for ${functions[0].name}.`,
+        );
       }
 
-      return new Tx(this.eth, firstMatchingOverload, this.contractAbi, this.address, args, this.defaultOptions);
+      return new Tx(
+        this.eth,
+        firstMatchingOverload,
+        this.contractAbi,
+        this.address,
+        args,
+        this.defaultOptions,
+      );
     };
   }
 
   private buildMethods() {
     const methods: any = {};
 
-    this.contractAbi.functions.forEach(f => {
+    this.contractAbi.functions.forEach((f) => {
       const executor = this.executorFactory([f]);
       methods[f.asString()] = executor;
       methods[f.signature] = executor;
     });
 
-    const grouped = this.contractAbi.functions.reduce(
-      (acc, method) => {
-        const funcs = [...(acc[method.name!] || []), method];
-        return { ...acc, [method.name!]: funcs };
-      },
-      {} as { [name: string]: ContractFunctionEntry[] },
-    );
+    const grouped = this.contractAbi.functions.reduce((acc, method) => {
+      const funcs = [...(acc[method.name!] || []), method];
+      return { ...acc, [method.name!]: funcs };
+    }, {} as { [name: string]: ContractFunctionEntry[] });
 
     Object.entries(grouped).map(([name, funcs]) => {
       methods[name] = this.executorFactory(funcs);
@@ -228,7 +266,7 @@ export class Contract<T extends ContractDefinition | void = void> {
   private buildEvents() {
     const events: any = {};
 
-    this.contractAbi.events.forEach(e => {
+    this.contractAbi.events.forEach((e) => {
       const event = this.on.bind(this, e.signature!);
 
       if (!events[e.name!]) {
@@ -244,7 +282,10 @@ export class Contract<T extends ContractDefinition | void = void> {
     return events;
   }
 
-  private getLogOptions(eventName: string = 'allevents', options: LogRequest): LogRequest {
+  private getLogOptions(
+    eventName: string = 'allevents',
+    options: LogRequest,
+  ): LogRequest {
     if (!this.address) {
       throw new Error('No contract address.');
     }
@@ -257,7 +298,9 @@ export class Contract<T extends ContractDefinition | void = void> {
     }
 
     const event = this.contractAbi.events.find(
-      e => e.name === eventName || e.signature === '0x' + eventName.replace('0x', ''),
+      (e) =>
+        e.name === eventName ||
+        e.signature === '0x' + eventName.replace('0x', ''),
     );
 
     if (!event) {

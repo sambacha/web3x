@@ -19,7 +19,7 @@ const JsonRpc = {
   messageId: 0,
 };
 
-const validateSingleMessage = message =>
+const validateSingleMessage = (message) =>
   !!message &&
   !message.error &&
   message.jsonrpc === '2.0' &&
@@ -47,7 +47,10 @@ export interface JsonRpcResponse {
 /**
  * Should be called to valid json create payload object
  */
-export function createJsonRpcPayload(method: string, params?: any[]): JsonRpcRequest {
+export function createJsonRpcPayload(
+  method: string,
+  params?: any[],
+): JsonRpcRequest {
   JsonRpc.messageId++;
 
   return {
@@ -62,12 +65,18 @@ export function createJsonRpcPayload(method: string, params?: any[]): JsonRpcReq
  * Should be called to check if jsonrpc response is valid
  */
 export function isValidJsonRpcResponse(response: any) {
-  return Array.isArray(response) ? response.every(validateSingleMessage) : validateSingleMessage(response);
+  return Array.isArray(response)
+    ? response.every(validateSingleMessage)
+    : validateSingleMessage(response);
 }
 
 /**
  * Should be called to create batch payload object
  */
-export function createJsonRpcBatchPayload(messages: { method: string; params?: any[] }[]) {
-  return messages.map(message => createJsonRpcPayload(message.method, message.params));
+export function createJsonRpcBatchPayload(
+  messages: { method: string; params?: any[] }[],
+) {
+  return messages.map((message) =>
+    createJsonRpcPayload(message.method, message.params),
+  );
 }

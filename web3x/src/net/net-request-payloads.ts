@@ -17,7 +17,7 @@
 
 import { hexToNumber } from '../utils';
 
-const identity = result => result;
+const identity = (result) => result;
 
 export class NetRequestPayloads {
   public getId() {

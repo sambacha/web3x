@@ -37,7 +37,11 @@ export interface AccountTx {
 }
 
 export class Account {
-  constructor(readonly address: Address, readonly privateKey: Buffer, readonly publicKey: Buffer) {}
+  constructor(
+    readonly address: Address,
+    readonly privateKey: Buffer,
+    readonly publicKey: Buffer,
+  ) {}
 
   public static create(entropy: Buffer = randomBuffer(32)) {
     const { privateKey, address, publicKey } = create(entropy);
@@ -49,7 +53,10 @@ export class Account {
     return new Account(Address.fromString(address), privateKey, publicKey);
   }
 
-  public static createFromMnemonicAndPath(mnemonic: string, derivationPath: string) {
+  public static createFromMnemonicAndPath(
+    mnemonic: string,
+    derivationPath: string,
+  ) {
     const seed = bip39.mnemonicToSeed(mnemonic);
     return Account.createFromSeedAndPath(seed, derivationPath);
   }
@@ -61,7 +68,11 @@ export class Account {
     return Account.fromPrivate(privateKey);
   }
 
-  public static async fromKeystore(v3Keystore: KeyStore | string, password: string, nonStrict = false) {
+  public static async fromKeystore(
+    v3Keystore: KeyStore | string,
+    password: string,
+    nonStrict = false,
+  ) {
     return Account.fromPrivate(await decrypt(v3Keystore, password, nonStrict));
   }
 
@@ -69,7 +80,9 @@ export class Account {
     const promise = new Promise<TransactionHash>(async (resolve, reject) => {
       try {
         const signedTx = await signTransaction(tx, this.privateKey, eth);
-        resolve(await eth.sendSignedTransaction(signedTx.rawTransaction).getTxHash());
+        resolve(
+          await eth.sendSignedTransaction(signedTx.rawTransaction).getTxHash(),
+        );
       } catch (err) {
         reject(err);
       }

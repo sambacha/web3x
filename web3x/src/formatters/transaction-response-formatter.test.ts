@@ -32,8 +32,10 @@ describe('formatters', () => {
           nonce: '0xb',
           transactionIndex: '0x1',
           blockNumber: '0x3e8',
-          blockHash: '0xc9b9cdc2092a9d6589d96662b1fd6949611163fb3910cf8a173cd060f17702f9',
-          hash: '0xd9b9cdc2092a9d6589d96662b1fd6949611163fb3910cf8a173cd060f17702f9',
+          blockHash:
+            '0xc9b9cdc2092a9d6589d96662b1fd6949611163fb3910cf8a173cd060f17702f9',
+          hash:
+            '0xd9b9cdc2092a9d6589d96662b1fd6949611163fb3910cf8a173cd060f17702f9',
           v: 'v',
           r: 'r',
           s: 's',
@@ -47,9 +49,11 @@ describe('formatters', () => {
         gasPrice: '1000',
         nonce: 11,
         blockNumber: 1000,
-        blockHash: '0xc9b9cdc2092a9d6589d96662b1fd6949611163fb3910cf8a173cd060f17702f9',
+        blockHash:
+          '0xc9b9cdc2092a9d6589d96662b1fd6949611163fb3910cf8a173cd060f17702f9',
         transactionIndex: 1,
-        hash: '0xd9b9cdc2092a9d6589d96662b1fd6949611163fb3910cf8a173cd060f17702f9',
+        hash:
+          '0xd9b9cdc2092a9d6589d96662b1fd6949611163fb3910cf8a173cd060f17702f9',
         v: 'v',
         r: 'r',
         s: 's',
@@ -69,7 +73,8 @@ describe('formatters', () => {
           transactionIndex: null,
           blockNumber: null,
           blockHash: null,
-          hash: '0xd9b9cdc2092a9d6589d96662b1fd6949611163fb3910cf8a173cd060f17702f9',
+          hash:
+            '0xd9b9cdc2092a9d6589d96662b1fd6949611163fb3910cf8a173cd060f17702f9',
           v: 'v',
           r: 'r',
           s: 's',
@@ -85,7 +90,8 @@ describe('formatters', () => {
         blockNumber: null,
         blockHash: null,
         transactionIndex: null,
-        hash: '0xd9b9cdc2092a9d6589d96662b1fd6949611163fb3910cf8a173cd060f17702f9',
+        hash:
+          '0xd9b9cdc2092a9d6589d96662b1fd6949611163fb3910cf8a173cd060f17702f9',
         v: 'v',
         r: 'r',
         s: 's',

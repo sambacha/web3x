@@ -44,7 +44,7 @@ export function inputPostFormatter(post) {
   }
 
   // format the following options
-  post.topics = post.topics.map(topic => {
+  post.topics = post.topics.map((topic) => {
     // convert only if not hex
     return topic.indexOf('0x') === 0 ? topic : utf8ToHex(topic);
   });

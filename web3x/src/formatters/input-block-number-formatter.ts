@@ -19,7 +19,9 @@ import { isString } from 'util';
 import { BlockHash, BlockType } from '../eth';
 import { isHexStrict, numberToHex } from '../utils';
 
-export function inputBlockNumberFormatter(block: BlockType | BlockHash | undefined): string | undefined {
+export function inputBlockNumberFormatter(
+  block: BlockType | BlockHash | undefined,
+): string | undefined {
   if (block === undefined) {
     return;
   } else if (block === 'genesis' || block === 'earliest') {

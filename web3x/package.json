@@ -58,36 +58,39 @@
     ]
   },
   "dependencies": {
+    "@d-fischer/isomorphic-ws": "^5.0.3",
     "@types/bn.js": "^4.11.2",
-    "@types/node": "^10.12.18",
-    "@types/ws": "^6.0.1",
+    "@types/node": "^14.14.37",
+    "@types/ws": "^7.4.1",
     "bip39": "^2.5.0",
-    "bn.js": "^4.11.8",
+    "bn.js": "^4.12.0",
     "browserify-aes": "^1.2.0",
-    "elliptic": "^6.4.0",
+    "elliptic": "^6.5.4",
     "hdkey": "^1.1.0",
     "idna-uts46-hx": "^2.3.1",
     "isomorphic-fetch": "^2.2.1",
-    "isomorphic-ws": "^4.0.1",
     "pbkdf2": "^3.0.17",
     "randombytes": "^2.0.6",
-    "rlp": "^2.2.3",
-    "swarm-js": "^0.1.39",
-    "tslib": "^1.9.3",
+    "rlp": "^2.2.6",
+    "tslib": "^2.2.0",
     "utf8": "^3.0.0",
-    "ws": "^6.1.0"
+    "ws": "^7.4.4"
   },
   "devDependencies": {
     "@types/isomorphic-fetch": "^0.0.35",
     "@types/jest": "^24.0.11",
     "@types/utf8": "^2.1.6",
+    "@typescript-eslint/eslint-plugin": "^2.34.0",
+    "@typescript-eslint/parser": "^2.34.0",
     "coveralls": "^3.0.2",
+    "eslint": "^6.8.0",
     "jest": "^24.5.0",
     "jest-dot-reporter": "^1.0.7",
     "ts-jest": "^24.0.0",
     "ts-node": "^7.0.1",
+    "tsdx": "^0.14.1",
     "tslint": "^5.12.1",
     "tslint-config-prettier": "^1.17.0",
-    "typescript": "^3.2.2"
+    "typescript": "^4.1.0"
   }
 }

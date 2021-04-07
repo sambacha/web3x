@@ -110,7 +110,15 @@ function ensureInteger(value, name) {
 
 // N = Cpu cost, r = Memory cost, p = parallelization cost
 // callback(error, progress, key)
-export function scrypt(password, salt, N, r, p, dkLen, callback?: (progress: number) => boolean) {
+export function scrypt(
+  password,
+  salt,
+  N,
+  r,
+  p,
+  dkLen,
+  callback?: (progress: number) => boolean,
+) {
   return new Promise<Buffer>(async (resolve, reject) => {
     N = ensureInteger(N, 'N');
     r = ensureInteger(r, 'r');
@@ -134,7 +142,10 @@ export function scrypt(password, salt, N, r, p, dkLen, callback?: (progress: num
     for (let i = 0; i < B.length; i++) {
       const j = i * 4;
       B[i] =
-        ((b[j + 3] & 0xff) << 24) | ((b[j + 2] & 0xff) << 16) | ((b[j + 1] & 0xff) << 8) | ((b[j + 0] & 0xff) << 0);
+        ((b[j + 3] & 0xff) << 24) |
+        ((b[j + 2] & 0xff) << 16) |
+        ((b[j + 1] & 0xff) << 8) |
+        ((b[j + 0] & 0xff) << 0);
     }
 
     const XY = new Uint32Array(64 * r);
@@ -163,7 +174,8 @@ export function scrypt(password, salt, N, r, p, dkLen, callback?: (progress: num
     const limit = Math.trunc(1000 / r);
 
     // Trick from scrypt-async; if there is a setImmediate shim in place, use it
-    const nextTick: any = typeof setImmediate !== 'undefined' ? setImmediate : setTimeout;
+    const nextTick: any =
+      typeof setImmediate !== 'undefined' ? setImmediate : setTimeout;
 
     // This is really all I changed; making scryptsy a state machine so we occasionally
     // stop and give other evnts on the evnt loop a chance to run. ~RicMoo

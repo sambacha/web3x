@@ -26,7 +26,10 @@ import { numberToBN } from './number-to-bn';
  * @return {Boolean}
  */
 export function isBN(object) {
-  return object instanceof BN || (object && object.constructor && object.constructor.name === 'BN');
+  return (
+    object instanceof BN ||
+    (object && object.constructor && object.constructor.name === 'BN')
+  );
 }
 
 /**

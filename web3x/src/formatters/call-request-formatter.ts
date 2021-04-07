@@ -16,7 +16,12 @@
 */
 
 import { Address } from '../address';
-import { bufferToHex, hexToBuffer, hexToNumberString, numberToHex } from '../utils';
+import {
+  bufferToHex,
+  hexToBuffer,
+  hexToNumberString,
+  numberToHex,
+} from '../utils';
 
 export interface CallRequest {
   from?: Address;

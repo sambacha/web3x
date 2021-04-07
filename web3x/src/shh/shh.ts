@@ -23,7 +23,15 @@ export class Shh {
 
   constructor(private provider: EthereumProvider) {}
 
-  private async send({ method, params, format }: { method: string; params?: any[]; format: any }) {
+  private async send({
+    method,
+    params,
+    format,
+  }: {
+    method: string;
+    params?: any[];
+    format: any;
+  }) {
     return format(await this.provider.send(method, params));
   }
 
@@ -133,12 +141,19 @@ export class Shh {
   }
 
   public subscribeMessages(options: SubscriptionOptions): Subscription<string> {
-    return new Subscription<string>('shh', 'messages', [options], this.provider, (message, sub) =>
-      sub.emit('data', message),
+    return new Subscription<string>(
+      'shh',
+      'messages',
+      [options],
+      this.provider,
+      (message, sub) => sub.emit('data', message),
     );
   }
 
-  public subscribe(type: 'messages', options: SubscriptionOptions): Subscription<any> {
+  public subscribe(
+    type: 'messages',
+    options: SubscriptionOptions,
+  ): Subscription<any> {
     switch (type) {
       case 'messages':
         return this.subscribeMessages(options);

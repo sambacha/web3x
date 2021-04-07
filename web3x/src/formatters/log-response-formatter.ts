@@ -57,15 +57,21 @@ export function fromRawLogResponse(log: RawLogResponse): LogResponse {
     typeof log.logIndex === 'string'
   ) {
     const shaId = sha3(
-      log.blockHash.replace('0x', '') + log.transactionHash.replace('0x', '') + log.logIndex.replace('0x', ''),
+      log.blockHash.replace('0x', '') +
+        log.transactionHash.replace('0x', '') +
+        log.logIndex.replace('0x', ''),
     );
     id = 'log_' + shaId.replace('0x', '').substr(0, 8);
   }
 
-  const blockNumber = log.blockNumber !== null ? hexToNumber(log.blockNumber) : null;
-  const transactionIndex = log.transactionIndex !== null ? hexToNumber(log.transactionIndex) : null;
+  const blockNumber =
+    log.blockNumber !== null ? hexToNumber(log.blockNumber) : null;
+  const transactionIndex =
+    log.transactionIndex !== null ? hexToNumber(log.transactionIndex) : null;
   const logIndex = log.logIndex !== null ? hexToNumber(log.logIndex) : null;
-  const address = isString(log.address) ? Address.fromString(log.address) : log.address;
+  const address = isString(log.address)
+    ? Address.fromString(log.address)
+    : log.address;
 
   return { ...log, id, blockNumber, transactionIndex, logIndex, address };
 }
@@ -76,7 +82,9 @@ export function toRawLogResponse(log: LogResponse): RawLogResponse {
     ...log,
     id: id ? id : undefined,
     blockNumber: isNumber(blockNumber) ? numberToHex(blockNumber) : null,
-    transactionIndex: isNumber(transactionIndex) ? numberToHex(transactionIndex) : null,
+    transactionIndex: isNumber(transactionIndex)
+      ? numberToHex(transactionIndex)
+      : null,
     logIndex: isNumber(logIndex) ? numberToHex(logIndex) : null,
     address: address.toString().toLowerCase(),
   };

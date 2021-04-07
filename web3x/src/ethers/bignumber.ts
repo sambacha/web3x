@@ -72,7 +72,11 @@ export class BigNumber implements Hexable {
         }
         defineReadOnly(this, '_hex', toHex(new BN(value)));
       } else {
-        errors.throwError('invalid BigNumber string value', errors.INVALID_ARGUMENT, { arg: 'value', value: value });
+        errors.throwError(
+          'invalid BigNumber string value',
+          errors.INVALID_ARGUMENT,
+          { arg: 'value', value: value },
+        );
       }
     } else if (typeof value === 'number') {
       if (parseInt(String(value)) !== value) {
@@ -99,9 +103,16 @@ export class BigNumber implements Hexable {
     } else if ((<any>value)._hex && isHexString((<any>value)._hex)) {
       defineReadOnly(this, '_hex', (<any>value)._hex);
     } else if (isArrayish(value)) {
-      defineReadOnly(this, '_hex', toHex(new BN(hexlify(value).substring(2), 16)));
+      defineReadOnly(
+        this,
+        '_hex',
+        toHex(new BN(hexlify(value).substring(2), 16)),
+      );
     } else {
-      errors.throwError('invalid BigNumber value', errors.INVALID_ARGUMENT, { arg: 'value', value: value });
+      errors.throwError('invalid BigNumber value', errors.INVALID_ARGUMENT, {
+        arg: 'value',
+        value: value,
+      });
     }
   }
 
@@ -124,7 +135,10 @@ export class BigNumber implements Hexable {
   div(other: BigNumberish): BigNumber {
     let o: BigNumber = bigNumberify(other);
     if (o.isZero()) {
-      errors.throwError('division by zero', errors.NUMERIC_FAULT, { operation: 'divide', fault: 'division by zero' });
+      errors.throwError('division by zero', errors.NUMERIC_FAULT, {
+        operation: 'divide',
+        fault: 'division by zero',
+      });
     }
     return toBigNumber(_bnify(this).div(toBN(other)));
   }

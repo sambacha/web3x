@@ -76,7 +76,7 @@ const tests = [
 
 describe('formatters', () => {
   describe('toRawTransactionRequest', () => {
-    tests.forEach(test => {
+    tests.forEach((test) => {
       it('should return the correct value', () => {
         expect(toRawTransactionRequest(test.input)).toEqual(test.result);
       });

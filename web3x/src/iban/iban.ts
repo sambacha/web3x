@@ -34,7 +34,7 @@ const leftPad = (str, bytes) => {
  * @param {String} iban the IBAN
  * @returns {String} the prepared IBAN
  */
-const iso13616Prepare = iban => {
+const iso13616Prepare = (iban) => {
   const A = 'A'.charCodeAt(0);
   const Z = 'Z'.charCodeAt(0);
 
@@ -43,7 +43,7 @@ const iso13616Prepare = iban => {
 
   return iban
     .split('')
-    .map(n => {
+    .map((n) => {
       const code = n.charCodeAt(0);
       if (code >= A && code <= Z) {
         // A = 10, B = 11, ... Z = 35
@@ -62,7 +62,7 @@ const iso13616Prepare = iban => {
  * @param {String} iban
  * @returns {Number}
  */
-const mod9710 = iban => {
+const mod9710 = (iban) => {
   let remainder = iban;
   let block;
 
@@ -159,7 +159,10 @@ export class Iban {
    * @param {Object} options, required options are "institution" and "identifier"
    * @return {Iban} the IBAN object
    */
-  public static createIndirect(options: { institution: string; identifier: string }) {
+  public static createIndirect(options: {
+    institution: string;
+    identifier: string;
+  }) {
     return Iban.fromBban('ETH' + options.institution + options.identifier);
   }
 
@@ -182,7 +185,10 @@ export class Iban {
    * @returns {Boolean} true if it is, otherwise false
    */
   public isValid() {
-    return /^XE[0-9]{2}(ETH[0-9A-Z]{13}|[0-9A-Z]{30,31})$/.test(this.iban) && mod9710(iso13616Prepare(this.iban)) === 1;
+    return (
+      /^XE[0-9]{2}(ETH[0-9A-Z]{13}|[0-9A-Z]{30,31})$/.test(this.iban) &&
+      mod9710(iso13616Prepare(this.iban)) === 1
+    );
   }
 
   /**

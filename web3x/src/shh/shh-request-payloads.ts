@@ -37,7 +37,7 @@ interface Post {
   targetPeer?: number;
 }
 
-const identity = result => result;
+const identity = (result) => result;
 
 class ShhRequestPayloads {
   public getVersion() {

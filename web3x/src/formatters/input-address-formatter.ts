@@ -32,7 +32,9 @@ export function inputAddressFormatter(address: string | Iban | Address) {
         .toString()
         .toLowerCase();
     }
-    throw new Error(`Address ${address} is invalid, the checksum failed, or its an indrect IBAN address.`);
+    throw new Error(
+      `Address ${address} is invalid, the checksum failed, or its an indrect IBAN address.`,
+    );
   } else if (address instanceof Iban) {
     return address
       .toAddress()

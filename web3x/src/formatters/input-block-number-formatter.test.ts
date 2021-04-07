@@ -28,7 +28,7 @@ const tests = [
 
 describe('formatters', () => {
   describe('inputBlockNumberFormatter', () => {
-    tests.forEach(test => {
+    tests.forEach((test) => {
       it('should turn ' + test.value + ' to ' + test.expected, () => {
         expect(inputBlockNumberFormatter(test.value)).toBe(test.expected);
       });

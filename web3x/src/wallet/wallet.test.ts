@@ -21,8 +21,12 @@ import { hexToBuffer } from '../utils';
 import { Wallet } from './wallet';
 
 describe('wallet', () => {
-  const address = Address.fromString('0xEB014f8c8B418Db6b45774c326A0E64C78914dC0');
-  const privateKey = hexToBuffer('0xbe6383dad004f233317e46ddb46ad31b16064d14447a95cc1d8c8d4bc61c3728');
+  const address = Address.fromString(
+    '0xEB014f8c8B418Db6b45774c326A0E64C78914dC0',
+  );
+  const privateKey = hexToBuffer(
+    '0xbe6383dad004f233317e46ddb46ad31b16064d14447a95cc1d8c8d4bc61c3728',
+  );
 
   it('creates the right number of wallets', () => {
     const wallet = new Wallet();
@@ -121,11 +125,11 @@ describe('wallet', () => {
     expect(wallet.length).toBe(0);
 
     wallet.create(count);
-    const initialAddresses = [0, 1, 2, 3, 4].map(n => wallet.get(n)!.address);
+    const initialAddresses = [0, 1, 2, 3, 4].map((n) => wallet.get(n)!.address);
     expect(wallet.length).toBe(count);
 
     const remainingAddresses = [0, 1, 3];
-    const beforeRemoval = remainingAddresses.map(n => wallet.get(n)!.address);
+    const beforeRemoval = remainingAddresses.map((n) => wallet.get(n)!.address);
 
     wallet.remove(2);
     wallet.remove(4);
@@ -133,7 +137,7 @@ describe('wallet', () => {
     expect(wallet.get(2)).toBeUndefined();
     expect(wallet.get(4)).toBeUndefined();
 
-    const afterRemoval = remainingAddresses.map(n => wallet.get(n)!.address);
+    const afterRemoval = remainingAddresses.map((n) => wallet.get(n)!.address);
 
     expect(wallet.length).toBe(3);
 
@@ -142,8 +146,10 @@ describe('wallet', () => {
     expect(Address.isAddress(wallet.accounts[4].address.toString())).toBe(true);
     expect(wallet.get(5)).toBeUndefined();
 
-    const afterMoreCreation = remainingAddresses.map(n => wallet.get(n)!.address);
-    const newAddresses = [0, 1, 2, 3, 4].map(n => wallet.get(n)!.address);
+    const afterMoreCreation = remainingAddresses.map(
+      (n) => wallet.get(n)!.address,
+    );
+    const newAddresses = [0, 1, 2, 3, 4].map((n) => wallet.get(n)!.address);
 
     // Checks for account overwrites
     expect(wallet.length).toBe(count);
@@ -192,7 +198,8 @@ describe('wallet', () => {
   }, 30000);
 
   it('should create correct accounts from mnemonic', () => {
-    const mnemonic = 'profit gather crucial census birth effort clinic roast harvest rebuild hidden bamboo';
+    const mnemonic =
+      'profit gather crucial census birth effort clinic roast harvest rebuild hidden bamboo';
     const addresses = [
       '0xa97ab6ec66bc2354a7d880bae18fea633752ca85',
       '0x7048779748e8899c8f8baa9dd6c8973411d0fa17',
@@ -208,7 +215,9 @@ describe('wallet', () => {
 
     const wallet = Wallet.fromMnemonic(mnemonic, 10);
 
-    expect(wallet.accounts.map(a => a.address.toString().toLowerCase())).toEqual(addresses);
+    expect(
+      wallet.accounts.map((a) => a.address.toString().toLowerCase()),
+    ).toEqual(addresses);
 
     addresses.forEach((address, i) => {
       expect(

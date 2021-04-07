@@ -40,7 +40,9 @@ import { subscribeForNewHeads } from './subscriptions/new-heads';
 import { subscribeForNewPendingTransactions } from './subscriptions/new-pending-transactions';
 import { subscribeForSyncing } from './subscriptions/syncing';
 
-declare const web3: { currentProvider?: LegacyProvider; ethereumProvider?: LegacyProvider } | undefined;
+declare const web3:
+  | { currentProvider?: LegacyProvider; ethereumProvider?: LegacyProvider }
+  | undefined;
 
 export type TypedSigningData = { type: string; name: string; value: string }[];
 
@@ -71,7 +73,15 @@ export class Eth {
     this.request.defaultFromAddress = address;
   }
 
-  private async send<T>({ method, params, format }: { method: string; params?: any[]; format: (x: any) => T }) {
+  private async send<T>({
+    method,
+    params,
+    format,
+  }: {
+    method: string;
+    params?: any[];
+    format: (x: any) => T;
+  }) {
     return format(await this.provider.send(method, params));
   }
 
@@ -119,7 +129,11 @@ export class Eth {
     return await this.send(this.request.getBalance(address, block));
   }
 
-  public async getStorageAt(address: Address, position: string, block?: BlockType) {
+  public async getStorageAt(
+    address: Address,
+    position: string,
+    block?: BlockType,
+  ) {
     return await this.send(this.request.getStorageAt(address, position, block));
   }
 
@@ -127,9 +141,18 @@ export class Eth {
     return await this.send(this.request.getCode(address, block));
   }
 
-  public async getBlock(block: BlockType | BlockHash, returnTxs?: false): Promise<BlockResponse<Buffer>>;
-  public async getBlock(block: BlockType | BlockHash, returnTxs?: true): Promise<BlockResponse<TransactionResponse>>;
-  public async getBlock(block: BlockType | BlockHash, returnTxs?: boolean): Promise<BlockResponse> {
+  public async getBlock(
+    block: BlockType | BlockHash,
+    returnTxs?: false,
+  ): Promise<BlockResponse<Buffer>>;
+  public async getBlock(
+    block: BlockType | BlockHash,
+    returnTxs?: true,
+  ): Promise<BlockResponse<TransactionResponse>>;
+  public async getBlock(
+    block: BlockType | BlockHash,
+    returnTxs?: boolean,
+  ): Promise<BlockResponse> {
     return await this.send(this.request.getBlock(block, returnTxs));
   }
 
@@ -143,7 +166,11 @@ export class Eth {
     uncleIndex: number,
     returnTxs?: true,
   ): Promise<BlockResponse<TransactionResponse>>;
-  public async getUncle(block: BlockType | BlockHash, uncleIndex: number, returnTxs?: boolean) {
+  public async getUncle(
+    block: BlockType | BlockHash,
+    uncleIndex: number,
+    returnTxs?: boolean,
+  ) {
     return await this.send(this.request.getUncle(block, uncleIndex, returnTxs));
   }
 
@@ -159,7 +186,10 @@ export class Eth {
     return await this.send(this.request.getTransaction(hash));
   }
 
-  public async getTransactionFromBlock(block: BlockType | BlockHash, index: number) {
+  public async getTransactionFromBlock(
+    block: BlockType | BlockHash,
+    index: number,
+  ) {
     return await this.send(this.request.getTransactionFromBlock(block, index));
   }
 
@@ -197,7 +227,9 @@ export class Eth {
         } else {
           const { from, ...fromlessTx } = tx;
           const signedTx = await account.signTransaction(fromlessTx, this);
-          const { method, params, format } = this.request.sendSignedTransaction(signedTx.rawTransaction);
+          const { method, params, format } = this.request.sendSignedTransaction(
+            signedTx.rawTransaction,
+          );
           const txHash = format(await this.provider.send(method, params));
           resolve(txHash);
         }
@@ -251,10 +283,15 @@ export class Eth {
     return await this.send(this.request.getPastLogs(options));
   }
 
-  public subscribe(type: 'logs', options?: LogRequest): Subscription<LogResponse>;
+  public subscribe(
+    type: 'logs',
+    options?: LogRequest,
+  ): Subscription<LogResponse>;
   public subscribe(type: 'syncing'): Subscription<object | boolean>;
   public subscribe(type: 'newBlockHeaders'): Subscription<BlockHeaderResponse>;
-  public subscribe(type: 'pendingTransactions'): Subscription<TransactionResponse>;
+  public subscribe(
+    type: 'pendingTransactions',
+  ): Subscription<TransactionResponse>;
   public subscribe(
     type: 'pendingTransactions' | 'newBlockHeaders' | 'syncing' | 'logs',
     ...args: any[]

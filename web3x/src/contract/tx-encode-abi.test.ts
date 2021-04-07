@@ -51,14 +51,18 @@ const abi = new ContractAbi([
 describe('eth', () => {
   describe('contract', () => {
     describe('encodeABI', () => {
-      const contractAddress = Address.fromString('0x11f4d0A3c12e86B4b5F39B213F7E19D048276DAe');
+      const contractAddress = Address.fromString(
+        '0x11f4d0A3c12e86B4b5F39B213F7E19D048276DAe',
+      );
       const mockEthereumProvider = new MockEthereumProvider();
       const eth = new Eth(mockEthereumProvider);
 
       it('should handle bytes32 arrays that only contain 1 byte', () => {
         const contract = new Contract(eth, abi, contractAddress);
 
-        const result = contract.methods.takesTwoBytes32('0xaa', '0xbb').encodeABI();
+        const result = contract.methods
+          .takesTwoBytes32('0xaa', '0xbb')
+          .encodeABI();
 
         expect(bufferToHex(result)).toBe(
           [
@@ -73,7 +77,10 @@ describe('eth', () => {
         const contract = new Contract(eth, abi, contractAddress);
 
         const result = contract.methods
-          .takesTwoBytes32('0x'.concat('a'.repeat(62)), '0x'.concat('b'.repeat(62)))
+          .takesTwoBytes32(
+            '0x'.concat('a'.repeat(62)),
+            '0x'.concat('b'.repeat(62)),
+          )
           .encodeABI();
 
         expect(bufferToHex(result)).toBe(
@@ -89,7 +96,12 @@ describe('eth', () => {
         const contract = new Contract(eth, abi, contractAddress);
 
         const test = () =>
-          contract.methods.takesTwoBytes32('0x'.concat('a'.repeat(63)), '0x'.concat('b'.repeat(63))).encodeABI();
+          contract.methods
+            .takesTwoBytes32(
+              '0x'.concat('a'.repeat(63)),
+              '0x'.concat('b'.repeat(63)),
+            )
+            .encodeABI();
 
         expect(test).toThrow();
       });
@@ -98,7 +110,10 @@ describe('eth', () => {
         const contract = new Contract(eth, abi, contractAddress);
 
         const result = contract.methods
-          .takesTwoBytes32('0x'.concat('a'.repeat(64)), '0x'.concat('b'.repeat(64)))
+          .takesTwoBytes32(
+            '0x'.concat('a'.repeat(64)),
+            '0x'.concat('b'.repeat(64)),
+          )
           .encodeABI();
 
         expect(bufferToHex(result)).toBe(
@@ -114,7 +129,12 @@ describe('eth', () => {
         const contract = new Contract(eth, abi, contractAddress);
 
         const test = () =>
-          contract.methods.takesTwoBytes32('0x'.concat('a'.repeat(66)), '0x'.concat('b'.repeat(66))).encodeABI();
+          contract.methods
+            .takesTwoBytes32(
+              '0x'.concat('a'.repeat(66)),
+              '0x'.concat('b'.repeat(66)),
+            )
+            .encodeABI();
 
         expect(test).toThrow();
       });

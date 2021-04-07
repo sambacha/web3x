@@ -37,12 +37,16 @@ export class SentDeployContractTx extends SentContractTx {
     receipt = await super.handleReceipt(receipt);
 
     if (!receipt.contractAddress) {
-      throw new Error('The contract deployment receipt did not contain a contract address.');
+      throw new Error(
+        'The contract deployment receipt did not contain a contract address.',
+      );
     }
 
     const code = await this.eth.getCode(receipt.contractAddress);
     if (code.length <= 2) {
-      throw new Error(`Contract code could not be stored at ${receipt.contractAddress}.`);
+      throw new Error(
+        `Contract code could not be stored at ${receipt.contractAddress}.`,
+      );
     }
 
     this.onDeployed(receipt.contractAddress);

@@ -16,14 +16,20 @@
 */
 
 import { Address } from '../address';
-import { RawBlockHeaderResponse, RawBlockResponse, RawTransactionResponse } from '../formatters';
+import {
+  RawBlockHeaderResponse,
+  RawBlockResponse,
+  RawTransactionResponse,
+} from '../formatters';
 import { MockEthereumProvider } from '../providers/mock-ethereum-provider';
 import { hexToBuffer, numberToHex } from '../utils';
 import { Eth } from './eth';
 
 describe('eth', () => {
   const from = Address.fromString('0x11f4d0A3c12e86B4b5F39B213F7E19D048276DAe');
-  const contractAddress = Address.fromString('0x1234567890123456789012345678901234567891');
+  const contractAddress = Address.fromString(
+    '0x1234567890123456789012345678901234567891',
+  );
   const basicTx = {
     from,
     to: Address.fromString('0x11f4d0A3c12e86B4b5F39B213F7E19D048276DAe'),
@@ -33,19 +39,26 @@ describe('eth', () => {
   };
   const blockHeader: RawBlockHeaderResponse = {
     hash: '0xd6960376d6c6dea93647383ffb245cfced97ccc5c7525397a543a72fdaea5265',
-    parentHash: '0x83ffb245cfced97ccc5c75253d6960376d6c6dea93647397a543a72fdaea5265',
+    parentHash:
+      '0x83ffb245cfced97ccc5c75253d6960376d6c6dea93647397a543a72fdaea5265',
     miner: '0xdcc6960376d6c6dea93647383ffb245cfced97cf',
-    stateRoot: '0x54dda68af07643f68739a6e9612ad157a26ae7e2ce81f77842bb5835fbcde583',
-    transactionsRoot: '0x64dda68af07643f68739a6e9612ad157a26ae7e2ce81f77842bb5835fbcde583',
-    receiptsRoot: '0x74dda68af07643f68739a6e9612ad157a26ae7e2ce81f77842bb5835fbcde583',
-    sha3Uncles: '0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347',
-    logsBloom: '0xd6960376d6c6dea93647383ffb245cfced97ccc5c7525397a543a72fdaea5265',
+    stateRoot:
+      '0x54dda68af07643f68739a6e9612ad157a26ae7e2ce81f77842bb5835fbcde583',
+    transactionsRoot:
+      '0x64dda68af07643f68739a6e9612ad157a26ae7e2ce81f77842bb5835fbcde583',
+    receiptsRoot:
+      '0x74dda68af07643f68739a6e9612ad157a26ae7e2ce81f77842bb5835fbcde583',
+    sha3Uncles:
+      '0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347',
+    logsBloom:
+      '0xd6960376d6c6dea93647383ffb245cfced97ccc5c7525397a543a72fdaea5265',
     difficulty: '0x3e8',
     number: '0x11',
     gasLimit: '0x3e8',
     gasUsed: '0x3e8',
     timestamp: '0x3e8',
-    extraData: '0xd6960376d6c6dea93647383ffb245cfced97ccc5c7525397a543a72fdaea5265',
+    extraData:
+      '0xd6960376d6c6dea93647383ffb245cfced97ccc5c7525397a543a72fdaea5265',
     nonce: '0xd6960376d6c6dea93647383ffb245cfced97ccc5c7525397a543a72fdaea5265',
   };
   const tx: RawTransactionResponse = {
@@ -58,7 +71,8 @@ describe('eth', () => {
     nonce: '0xb',
     transactionIndex: '0x1',
     blockNumber: '0x10',
-    blockHash: '0xc9b9cdc2092a9d6589d96662b1fd6949611163fb3910cf8a173cd060f17702f9',
+    blockHash:
+      '0xc9b9cdc2092a9d6589d96662b1fd6949611163fb3910cf8a173cd060f17702f9',
     hash: '0xd9b9cdc2092a9d6589d96662b1fd6949611163fb3910cf8a173cd060f17702f9',
     v: 'v',
     r: 'r',
@@ -107,7 +121,9 @@ describe('eth', () => {
     // eth_gasPrice
     mockEthereumProvider.send.mockResolvedValueOnce('0xffffdddd');
     // eth_sendTransaction
-    mockEthereumProvider.send.mockResolvedValueOnce('0x1234567453543456321456321');
+    mockEthereumProvider.send.mockResolvedValueOnce(
+      '0x1234567453543456321456321',
+    );
     // eth_getTransactionReceipt
     mockEthereumProvider.send.mockResolvedValueOnce({ blockHash: '0x1234' });
 
@@ -131,17 +147,17 @@ describe('eth', () => {
   });
 
   it('should send transaction, subscribe, wait for block and get receipt', async () => {
-    mockEthereumProvider.send.mockImplementationOnce(async method => {
+    mockEthereumProvider.send.mockImplementationOnce(async (method) => {
       expect(method).toBe('eth_sendTransaction');
       return '0x1234567453543456321456321';
     });
 
-    mockEthereumProvider.send.mockImplementationOnce(async method => {
+    mockEthereumProvider.send.mockImplementationOnce(async (method) => {
       expect(method).toBe('eth_getTransactionReceipt');
       return null;
     });
 
-    mockEthereumProvider.send.mockImplementationOnce(async method => {
+    mockEthereumProvider.send.mockImplementationOnce(async (method) => {
       expect(method).toBe('eth_subscribe');
 
       setTimeout(() => {
@@ -154,7 +170,7 @@ describe('eth', () => {
       return '0x1234567';
     });
 
-    mockEthereumProvider.send.mockImplementationOnce(async method => {
+    mockEthereumProvider.send.mockImplementationOnce(async (method) => {
       expect(method).toBe('eth_getTransactionReceipt');
       return {
         from: from.toString(),
@@ -183,17 +199,17 @@ describe('eth', () => {
   });
 
   it('should send transaction and fail after no receipt after 50 blocks', async () => {
-    mockEthereumProvider.send.mockImplementationOnce(async method => {
+    mockEthereumProvider.send.mockImplementationOnce(async (method) => {
       expect(method).toBe('eth_sendTransaction');
       return '0x1234567453543456321456321';
     });
 
-    mockEthereumProvider.send.mockImplementationOnce(async method => {
+    mockEthereumProvider.send.mockImplementationOnce(async (method) => {
       expect(method).toBe('eth_getTransactionReceipt');
       return null;
     });
 
-    mockEthereumProvider.send.mockImplementationOnce(async method => {
+    mockEthereumProvider.send.mockImplementationOnce(async (method) => {
       expect(method).toBe('eth_subscribe');
 
       // Fire 50 fake newBlocks
@@ -211,21 +227,23 @@ describe('eth', () => {
 
     const eth = new Eth(mockEthereumProvider);
 
-    await expect(eth.sendTransaction(basicTx).getReceipt()).rejects.toBeInstanceOf(Error);
+    await expect(
+      eth.sendTransaction(basicTx).getReceipt(),
+    ).rejects.toBeInstanceOf(Error);
   });
 
   it('should send transaction, subscribe, and receive emitted confirmation receipts', async () => {
-    mockEthereumProvider.send.mockImplementationOnce(async method => {
+    mockEthereumProvider.send.mockImplementationOnce(async (method) => {
       expect(method).toBe('eth_sendTransaction');
       return '0x1234567453543456321456321';
     });
 
-    mockEthereumProvider.send.mockImplementationOnce(async method => {
+    mockEthereumProvider.send.mockImplementationOnce(async (method) => {
       expect(method).toBe('eth_getTransactionReceipt');
       return null;
     });
 
-    mockEthereumProvider.send.mockImplementationOnce(async method => {
+    mockEthereumProvider.send.mockImplementationOnce(async (method) => {
       expect(method).toBe('eth_subscribe');
 
       // Fire 10 fake newBlocks
@@ -284,7 +302,9 @@ describe('eth', () => {
   it('should get block with transaction hash in response', async () => {
     const testBlock = {
       ...block,
-      transactions: ['0xd9b9cdc2092a9d6589d96662b1fd6949611163fb3910cf8a173cd060f17702f9'],
+      transactions: [
+        '0xd9b9cdc2092a9d6589d96662b1fd6949611163fb3910cf8a173cd060f17702f9',
+      ],
     };
 
     mockEthereumProvider.send.mockImplementationOnce(async (method, params) => {
@@ -296,7 +316,9 @@ describe('eth', () => {
     const eth = new Eth(mockEthereumProvider);
     const resultBlock = await eth.getBlock(0);
 
-    expect(resultBlock.transactions[0]).toEqual(hexToBuffer(testBlock.transactions[0]));
+    expect(resultBlock.transactions[0]).toEqual(
+      hexToBuffer(testBlock.transactions[0]),
+    );
   });
 
   it('should get block with transaction response in response', async () => {

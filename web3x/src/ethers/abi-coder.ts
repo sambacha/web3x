@@ -64,7 +64,10 @@ const paramTypeBytes = new RegExp(/^bytes([0-9]*)$/);
 const paramTypeNumber = new RegExp(/^(u?int)([0-9]*)$/);
 const paramTypeArray = new RegExp(/^(.*)\[([0-9]*)\]$/);
 
-export const defaultCoerceFunc: CoerceFunc = function(type: string, value: any): any {
+export const defaultCoerceFunc: CoerceFunc = function(
+  type: string,
+  value: any,
+): any {
   var match = type.match(paramTypeNumber);
   if (match && parseInt(match[2]) <= 48) {
     return value.toNumber();
@@ -108,7 +111,15 @@ type ParseNode = {
 
 function parseParam(param: string, allowIndexed?: boolean): ParamType {
   function throwError(i: number) {
-    throw new Error('unexpected character "' + param[i] + '" at position ' + i + ' in "' + param + '"');
+    throw new Error(
+      'unexpected character "' +
+        param[i] +
+        '" at position ' +
+        i +
+        ' in "' +
+        param +
+        '"',
+    );
   }
 
   var parent: ParseNode = { type: '', name: '', state: { allowType: true } };
@@ -123,7 +134,9 @@ function parseParam(param: string, allowIndexed?: boolean): ParamType {
         }
         node.state.allowType = false;
         node.type = verifyType(node.type);
-        node.components = [{ type: '', name: '', parent: node, state: { allowType: true } }];
+        node.components = [
+          { type: '', name: '', parent: node, state: { allowType: true } },
+        ];
         node = node.components[0];
         break;
 
@@ -154,7 +167,12 @@ function parseParam(param: string, allowIndexed?: boolean): ParamType {
         }
         node.type = verifyType(node.type);
 
-        var sibling: ParseNode = { type: '', name: '', parent: node.parent, state: { allowType: true } };
+        var sibling: ParseNode = {
+          type: '',
+          name: '',
+          parent: node.parent,
+          state: { allowType: true },
+        };
         node.parent.components.push(sibling);
         delete node.parent;
         node = sibling;
@@ -384,11 +402,20 @@ export function formatParamType(paramType: ParamType): string {
 }
 
 // @TODO: Allow a second boolean to expose names and modifiers
-export function formatSignature(fragment: EventFragment | FunctionFragment): string {
-  return fragment.name + '(' + fragment.inputs.map(i => formatParamType(i)).join(',') + ')';
+export function formatSignature(
+  fragment: EventFragment | FunctionFragment,
+): string {
+  return (
+    fragment.name +
+    '(' +
+    fragment.inputs.map((i) => formatParamType(i)).join(',') +
+    ')'
+  );
 }
 
-export function parseSignature(fragment: string): EventFragment | FunctionFragment {
+export function parseSignature(
+  fragment: string,
+): EventFragment | FunctionFragment {
   if (typeof fragment === 'string') {
     // Make sure the "returns" is surrounded by a space and all whitespace is exactly one space
     fragment = fragment
@@ -420,7 +447,13 @@ abstract class Coder {
   readonly type: string;
   readonly localName: string;
   readonly dynamic: boolean;
-  constructor(coerceFunc: CoerceFunc, name: string, type: string, localName: string = '', dynamic: boolean) {
+  constructor(
+    coerceFunc: CoerceFunc,
+    name: string,
+    type: string,
+    localName: string = '',
+    dynamic: boolean,
+  ) {
     this.coerceFunc = coerceFunc;
     this.name = name;
     this.type = type;
@@ -470,7 +503,12 @@ class CoderNull extends Coder {
 class CoderNumber extends Coder {
   readonly size: number;
   readonly signed: boolean;
-  constructor(coerceFunc: CoerceFunc, size: number, signed: boolean, localName: string) {
+  constructor(
+    coerceFunc: CoerceFunc,
+    size: number,
+    signed: boolean,
+    localName: string,
+  ) {
     const name = (signed ? 'int' : 'uint') + size * 8;
     super(coerceFunc, name, name, localName, false);
 
@@ -501,21 +539,29 @@ class CoderNumber extends Coder {
 
       return padZeros(arrayify(v), 32);
     } catch (error) {
-      return errors.throwError('invalid number value', errors.INVALID_ARGUMENT, {
-        arg: this.localName,
-        coderType: this.name,
-        value: value,
-      });
+      return errors.throwError(
+        'invalid number value',
+        errors.INVALID_ARGUMENT,
+        {
+          arg: this.localName,
+          coderType: this.name,
+          value: value,
+        },
+      );
     }
   }
 
   decode(data: Uint8Array, offset: number): DecodedResult {
     if (data.length < offset + 32) {
-      errors.throwError('insufficient data for ' + this.name + ' type', errors.INVALID_ARGUMENT, {
-        arg: this.localName,
-        coderType: this.name,
-        value: hexlify(data.slice(offset, offset + 32)),
-      });
+      errors.throwError(
+        'insufficient data for ' + this.name + ' type',
+        errors.INVALID_ARGUMENT,
+        {
+          arg: this.localName,
+          coderType: this.name,
+          value: hexlify(data.slice(offset, offset + 32)),
+        },
+      );
     }
     var junkLength = 32 - this.size;
     var value = bigNumberify(data.slice(offset + junkLength, offset + 32));
@@ -554,11 +600,15 @@ class CoderBoolean extends Coder {
       var result = uint256Coder.decode(data, offset);
     } catch (error) {
       if (error.reason === 'insufficient data for uint256 type') {
-        errors.throwError('insufficient data for boolean type', errors.INVALID_ARGUMENT, {
-          arg: this.localName,
-          coderType: 'boolean',
-          value: error.value,
-        });
+        errors.throwError(
+          'insufficient data for boolean type',
+          errors.INVALID_ARGUMENT,
+          {
+            arg: this.localName,
+            coderType: 'boolean',
+            value: error.value,
+          },
+        );
       }
       throw error;
     }
@@ -590,11 +640,15 @@ class CoderFixedBytes extends Coder {
       }
       result.set(data);
     } catch (error) {
-      errors.throwError('invalid ' + this.name + ' value', errors.INVALID_ARGUMENT, {
-        arg: this.localName,
-        coderType: this.name,
-        value: error.value || value,
-      });
+      errors.throwError(
+        'invalid ' + this.name + ' value',
+        errors.INVALID_ARGUMENT,
+        {
+          arg: this.localName,
+          coderType: this.name,
+          value: error.value || value,
+        },
+      );
     }
 
     return result;
@@ -602,16 +656,23 @@ class CoderFixedBytes extends Coder {
 
   decode(data: Uint8Array, offset: number): DecodedResult {
     if (data.length < offset + 32) {
-      errors.throwError('insufficient data for ' + name + ' type', errors.INVALID_ARGUMENT, {
-        arg: this.localName,
-        coderType: this.name,
-        value: hexlify(data.slice(offset, offset + 32)),
-      });
+      errors.throwError(
+        'insufficient data for ' + name + ' type',
+        errors.INVALID_ARGUMENT,
+        {
+          arg: this.localName,
+          coderType: this.name,
+          value: hexlify(data.slice(offset, offset + 32)),
+        },
+      );
     }
 
     return {
       consumed: 32,
-      value: this.coerceFunc(this.name, hexlify(data.slice(offset, offset + this.length))),
+      value: this.coerceFunc(
+        this.name,
+        hexlify(data.slice(offset, offset + this.length)),
+      ),
     };
   }
 }
@@ -626,25 +687,36 @@ class CoderAddress extends Coder {
     try {
       result.set(arrayify(value.toBuffer()), 12);
     } catch (error) {
-      errors.throwError(`invalid address (${error.message})`, errors.INVALID_ARGUMENT, {
-        arg: this.localName,
-        coderType: 'address',
-        value: value,
-      });
+      errors.throwError(
+        `invalid address (${error.message})`,
+        errors.INVALID_ARGUMENT,
+        {
+          arg: this.localName,
+          coderType: 'address',
+          value: value,
+        },
+      );
     }
     return result;
   }
   decode(data: Uint8Array, offset: number): DecodedResult {
     if (data.length < offset + 32) {
-      errors.throwError('insufficuent data for address type', errors.INVALID_ARGUMENT, {
-        arg: this.localName,
-        coderType: 'address',
-        value: hexlify(data.slice(offset, offset + 32)),
-      });
+      errors.throwError(
+        'insufficuent data for address type',
+        errors.INVALID_ARGUMENT,
+        {
+          arg: this.localName,
+          coderType: 'address',
+          value: hexlify(data.slice(offset, offset + 32)),
+        },
+      );
     }
     return {
       consumed: 32,
-      value: this.coerceFunc('address', getAddress(hexlify(data.slice(offset + 12, offset + 32)))),
+      value: this.coerceFunc(
+        'address',
+        getAddress(hexlify(data.slice(offset + 12, offset + 32))),
+      ),
     };
   }
 }
@@ -656,32 +728,48 @@ function _encodeDynamicBytes(value: Uint8Array): Uint8Array {
   return concat([uint256Coder.encode(value.length), value, padding]);
 }
 
-function _decodeDynamicBytes(data: Uint8Array, offset: number, localName: string): DecodedResult {
+function _decodeDynamicBytes(
+  data: Uint8Array,
+  offset: number,
+  localName: string,
+): DecodedResult {
   if (data.length < offset + 32) {
-    errors.throwError('insufficient data for dynamicBytes length', errors.INVALID_ARGUMENT, {
-      arg: localName,
-      coderType: 'dynamicBytes',
-      value: hexlify(data.slice(offset, offset + 32)),
-    });
+    errors.throwError(
+      'insufficient data for dynamicBytes length',
+      errors.INVALID_ARGUMENT,
+      {
+        arg: localName,
+        coderType: 'dynamicBytes',
+        value: hexlify(data.slice(offset, offset + 32)),
+      },
+    );
   }
 
   var length = uint256Coder.decode(data, offset).value;
   try {
     length = length.toNumber();
   } catch (error) {
-    errors.throwError('dynamic bytes count too large', errors.INVALID_ARGUMENT, {
-      arg: localName,
-      coderType: 'dynamicBytes',
-      value: length.toString(),
-    });
+    errors.throwError(
+      'dynamic bytes count too large',
+      errors.INVALID_ARGUMENT,
+      {
+        arg: localName,
+        coderType: 'dynamicBytes',
+        value: length.toString(),
+      },
+    );
   }
 
   if (data.length < offset + 32 + length) {
-    errors.throwError('insufficient data for dynamicBytes type', errors.INVALID_ARGUMENT, {
-      arg: localName,
-      coderType: 'dynamicBytes',
-      value: hexlify(data.slice(offset, offset + 32 + length)),
-    });
+    errors.throwError(
+      'insufficient data for dynamicBytes type',
+      errors.INVALID_ARGUMENT,
+      {
+        arg: localName,
+        coderType: 'dynamicBytes',
+        value: hexlify(data.slice(offset, offset + 32 + length)),
+      },
+    );
   }
 
   return {
@@ -803,14 +891,21 @@ function pack(coders: Array<Coder>, values: Array<any>): Uint8Array {
   return data;
 }
 
-function unpack(coders: Array<Coder>, data: Uint8Array, offset: number): DecodedResult {
+function unpack(
+  coders: Array<Coder>,
+  data: Uint8Array,
+  offset: number,
+): DecodedResult {
   var baseOffset = offset;
   var consumed = 0;
   var value: any = [];
   coders.forEach(function(coder) {
     if (coder.dynamic) {
       var dynamicOffset = uint256Coder.decode(data, offset);
-      var result = coder.decode(data, baseOffset + dynamicOffset.value.toNumber());
+      var result = coder.decode(
+        data,
+        baseOffset + dynamicOffset.value.toNumber(),
+      );
       // The dynamic part is leap-frogged somewhere else; doesn't count towards size
       result.consumed = dynamicOffset.consumed;
     } else {
@@ -851,7 +946,12 @@ function unpack(coders: Array<Coder>, data: Uint8Array, offset: number): Decoded
 class CoderArray extends Coder {
   readonly coder: Coder;
   readonly length: number;
-  constructor(coerceFunc: CoerceFunc, coder: Coder, length: number, localName: string) {
+  constructor(
+    coerceFunc: CoerceFunc,
+    coder: Coder,
+    length: number,
+    localName: string,
+  ) {
     const type = coder.type + '[' + (length >= 0 ? length : '') + ']';
     const dynamic = length === -1 || coder.dynamic;
     super(coerceFunc, 'array', type, localName, dynamic);
@@ -877,7 +977,11 @@ class CoderArray extends Coder {
       result = uint256Coder.encode(count);
     }
 
-    errors.checkArgumentCount(count, value.length, 'in coder array' + (this.localName ? ' ' + this.localName : ''));
+    errors.checkArgumentCount(
+      count,
+      value.length,
+      'in coder array' + (this.localName ? ' ' + this.localName : ''),
+    );
 
     var coders: any[] = [];
     for (var i = 0; i < value.length; i++) {
@@ -899,11 +1003,15 @@ class CoderArray extends Coder {
       try {
         var decodedLength = uint256Coder.decode(data, offset);
       } catch (error) {
-        return errors.throwError('insufficient data for dynamic array length', errors.INVALID_ARGUMENT, {
-          arg: this.localName,
-          coderType: 'array',
-          value: error.value,
-        });
+        return errors.throwError(
+          'insufficient data for dynamic array length',
+          errors.INVALID_ARGUMENT,
+          {
+            arg: this.localName,
+            coderType: 'array',
+            value: error.value,
+          },
+        );
       }
       try {
         count = decodedLength.value.toNumber();
@@ -1001,7 +1109,11 @@ const paramTypeSimple: { [key: string]: any } = {
   bytes: CoderDynamicBytes,
 };
 
-function getTupleParamCoder(coerceFunc: CoerceFunc, components: Array<any>, localName: string): CoderTuple {
+function getTupleParamCoder(
+  coerceFunc: CoerceFunc,
+  components: Array<any>,
+  localName: string,
+): CoderTuple {
   if (!components) {
     components = [];
   }
@@ -1022,12 +1134,21 @@ function getParamCoder(coerceFunc: CoerceFunc, param: ParamType): Coder {
   if (match) {
     let size = parseInt(match[2] || '256');
     if (size === 0 || size > 256 || size % 8 !== 0) {
-      return errors.throwError('invalid ' + match[1] + ' bit length', errors.INVALID_ARGUMENT, {
-        arg: 'param',
-        value: param,
-      });
+      return errors.throwError(
+        'invalid ' + match[1] + ' bit length',
+        errors.INVALID_ARGUMENT,
+        {
+          arg: 'param',
+          value: param,
+        },
+      );
     }
-    return new CoderNumber(coerceFunc, size / 8, match[1] === 'int', param.name!);
+    return new CoderNumber(
+      coerceFunc,
+      size / 8,
+      match[1] === 'int',
+      param.name!,
+    );
   }
 
   var match = param.type.match(paramTypeBytes);
@@ -1048,7 +1169,12 @@ function getParamCoder(coerceFunc: CoerceFunc, param: ParamType): Coder {
     param = shallowCopy(param);
     param.type = match[1];
     param = deepCopy(param);
-    return new CoderArray(coerceFunc, getParamCoder(coerceFunc, param), size, param.name!);
+    return new CoderArray(
+      coerceFunc,
+      getParamCoder(coerceFunc, param),
+      size,
+      param.name!,
+    );
   }
 
   if (param.type.substring(0, 5) === 'tuple') {
@@ -1078,10 +1204,14 @@ export class AbiCoder {
 
   encode(types: Array<string | ParamType>, values: Array<any>): string {
     if (types.length !== values.length) {
-      errors.throwError('types/values length mismatch', errors.INVALID_ARGUMENT, {
-        count: { types: types.length, values: values.length },
-        value: { types: types, values: values },
-      });
+      errors.throwError(
+        'types/values length mismatch',
+        errors.INVALID_ARGUMENT,
+        {
+          count: { types: types.length, values: values.length },
+          value: { types: types, values: values },
+        },
+      );
     }
 
     var coders: Array<Coder> = [];
@@ -1117,7 +1247,10 @@ export class AbiCoder {
       coders.push(getParamCoder(this.coerceFunc, typeObject));
     }, this);
 
-    return new CoderTuple(this.coerceFunc, coders, '_').decode(arrayify(data), 0).value;
+    return new CoderTuple(this.coerceFunc, coders, '_').decode(
+      arrayify(data),
+      0,
+    ).value;
   }
 }
 

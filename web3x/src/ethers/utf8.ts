@@ -98,7 +98,9 @@ export function toUtf8String(bytes: Arrayish, ignoreErrors?: boolean): string {
     } else {
       if (!ignoreErrors) {
         if ((c & 0xc0) === 0x80) {
-          throw new Error('invalid utf8 byte sequence; unexpected continuation byte');
+          throw new Error(
+            'invalid utf8 byte sequence; unexpected continuation byte',
+          );
         }
         throw new Error('invalid utf8 byte sequence; invalid prefix');
       }
@@ -139,7 +141,9 @@ export function toUtf8String(bytes: Arrayish, ignoreErrors?: boolean): string {
 
     if (res === null) {
       if (!ignoreErrors) {
-        throw new Error('invalid utf8 byte sequence; invalid continuation byte');
+        throw new Error(
+          'invalid utf8 byte sequence; invalid continuation byte',
+        );
       }
       continue;
     }
@@ -174,7 +178,10 @@ export function toUtf8String(bytes: Arrayish, ignoreErrors?: boolean): string {
     }
 
     res -= 0x10000;
-    result += String.fromCharCode(((res >> 10) & 0x3ff) + 0xd800, (res & 0x3ff) + 0xdc00);
+    result += String.fromCharCode(
+      ((res >> 10) & 0x3ff) + 0xd800,
+      (res & 0x3ff) + 0xdc00,
+    );
   }
 
   return result;

@@ -16,7 +16,12 @@
 */
 
 import { Address } from '../address';
-import { bufferToHex, hexToBuffer, hexToNumberString, numberToHex } from '../utils';
+import {
+  bufferToHex,
+  hexToBuffer,
+  hexToNumberString,
+  numberToHex,
+} from '../utils';
 
 export interface PartialTransactionRequest {
   from?: Address;
@@ -48,7 +53,9 @@ export interface RawTransactionRequest {
   nonce?: string;
 }
 
-export function toRawTransactionRequest(tx: TransactionRequest): RawTransactionRequest {
+export function toRawTransactionRequest(
+  tx: TransactionRequest,
+): RawTransactionRequest {
   const { from, to, gas, gasPrice, value, nonce, data } = tx;
   return {
     from: from.toString().toLowerCase(),
@@ -61,7 +68,9 @@ export function toRawTransactionRequest(tx: TransactionRequest): RawTransactionR
   };
 }
 
-export function fromRawTransactionRequest(tx: RawTransactionRequest): TransactionRequest {
+export function fromRawTransactionRequest(
+  tx: RawTransactionRequest,
+): TransactionRequest {
   const { from, to, gas, gasPrice, value, nonce, data } = tx;
   return {
     from: Address.fromString(from),

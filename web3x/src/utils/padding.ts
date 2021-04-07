@@ -30,7 +30,9 @@ export let leftPad = (str: string, chars: number, sign = '0') => {
 
   const padding = chars - str.length + 1 >= 0 ? chars - str.length + 1 : 0;
 
-  return (hasPrefix ? '0x' : '') + new Array(padding).join(sign ? sign : '0') + str;
+  return (
+    (hasPrefix ? '0x' : '') + new Array(padding).join(sign ? sign : '0') + str
+  );
 };
 
 /**
@@ -48,5 +50,7 @@ export let rightPad = (str: string, chars: number, sign = '0') => {
 
   const padding = chars - str.length + 1 >= 0 ? chars - str.length + 1 : 0;
 
-  return (hasPrefix ? '0x' : '') + str + new Array(padding).join(sign ? sign : '0');
+  return (
+    (hasPrefix ? '0x' : '') + str + new Array(padding).join(sign ? sign : '0')
+  );
 };

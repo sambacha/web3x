@@ -60,13 +60,17 @@ let _permanentCensorErrors = false;
 let _censorErrors = false;
 
 // @TODO: Enum
-export function throwError(message: string, code: string = UNKNOWN_ERROR, params: any = {}): never {
+export function throwError(
+  message: string,
+  code: string = UNKNOWN_ERROR,
+  params: any = {},
+): never {
   if (_censorErrors) {
     throw new Error('unknown error');
   }
 
   let messageDetails: Array<string> = [];
-  Object.keys(params).forEach(key => {
+  Object.keys(params).forEach((key) => {
     try {
       messageDetails.push(key + '=' + JSON.stringify(params[key]));
     } catch (error) {
@@ -98,21 +102,33 @@ export function checkNew(self: any, kind: any): void {
   }
 }
 
-export function checkArgumentCount(count: number, expectedCount: number, suffix?: string): void {
+export function checkArgumentCount(
+  count: number,
+  expectedCount: number,
+  suffix?: string,
+): void {
   if (!suffix) {
     suffix = '';
   }
   if (count < expectedCount) {
-    throwError('missing argument' + suffix, MISSING_ARGUMENT, { count: count, expectedCount: expectedCount });
+    throwError('missing argument' + suffix, MISSING_ARGUMENT, {
+      count: count,
+      expectedCount: expectedCount,
+    });
   }
   if (count > expectedCount) {
-    throwError('too many arguments' + suffix, UNEXPECTED_ARGUMENT, { count: count, expectedCount: expectedCount });
+    throwError('too many arguments' + suffix, UNEXPECTED_ARGUMENT, {
+      count: count,
+      expectedCount: expectedCount,
+    });
   }
 }
 
 export function setCensorship(censorship: boolean, permanent?: boolean): void {
   if (_permanentCensorErrors) {
-    throwError('error censorship permanent', UNSUPPORTED_OPERATION, { operation: 'setCersorship' });
+    throwError('error censorship permanent', UNSUPPORTED_OPERATION, {
+      operation: 'setCersorship',
+    });
   }
 
   _censorErrors = !!censorship;

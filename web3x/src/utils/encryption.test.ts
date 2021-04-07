@@ -26,14 +26,16 @@ const staticTests: { json: KeyStore; password: string; priv: string }[] = [
         cipherparams: {
           iv: '83dbcc02d8ccb40e466191a123791e0e',
         },
-        ciphertext: 'd172bf743a674da9cdad04534d56926ef8358534d458fffccd4e6ad2fbde479c',
+        ciphertext:
+          'd172bf743a674da9cdad04534d56926ef8358534d458fffccd4e6ad2fbde479c',
         kdf: 'scrypt',
         kdfparams: {
           dklen: 32,
           n: 262144,
           r: 1,
           p: 8,
-          salt: 'ab0c7876052600dd703518d6fc3fe8984592145b591fc8fb5c6d43190334ba19',
+          salt:
+            'ab0c7876052600dd703518d6fc3fe8984592145b591fc8fb5c6d43190334ba19',
         },
         mac: '2103ac29920d71da29f15d75b4a16dbe95cfd7ff8faea1056c33131d846e3097',
       },
@@ -51,14 +53,16 @@ const staticTests: { json: KeyStore; password: string; priv: string }[] = [
         cipherparams: {
           iv: 'e0c41130a323adc1446fc82f724bca2f',
         },
-        ciphertext: '9517cd5bdbe69076f9bf5057248c6c050141e970efa36ce53692d5d59a3984',
+        ciphertext:
+          '9517cd5bdbe69076f9bf5057248c6c050141e970efa36ce53692d5d59a3984',
         kdf: 'scrypt',
         kdfparams: {
           dklen: 32,
           n: 2,
           r: 8,
           p: 1,
-          salt: '711f816911c92d649fb4c84b047915679933555030b3552c1212609b38208c63',
+          salt:
+            '711f816911c92d649fb4c84b047915679933555030b3552c1212609b38208c63',
         },
         mac: 'd5e116151c6aa71470e67a7d42c9620c75c4d23229847dcc127794f0732b0db5',
       },
@@ -76,14 +80,16 @@ const staticTests: { json: KeyStore; password: string; priv: string }[] = [
         cipherparams: {
           iv: '3ca92af36ad7c2cd92454c59cea5ef00',
         },
-        ciphertext: '108b7d34f3442fc26ab1ab90ca91476ba6bfa8c00975a49ef9051dc675aa',
+        ciphertext:
+          '108b7d34f3442fc26ab1ab90ca91476ba6bfa8c00975a49ef9051dc675aa',
         kdf: 'scrypt',
         kdfparams: {
           dklen: 32,
           n: 2,
           r: 8,
           p: 1,
-          salt: 'd0769e608fb86cda848065642a9c6fa046845c928175662b8e356c77f914cd3b',
+          salt:
+            'd0769e608fb86cda848065642a9c6fa046845c928175662b8e356c77f914cd3b',
         },
         mac: '75d0e6759f7b3cefa319c3be41680ab6beea7d8328653474bd06706d4cc67420',
       },
@@ -101,13 +107,15 @@ const staticTests: { json: KeyStore; password: string; priv: string }[] = [
         cipherparams: {
           iv: '6087dab2f9fdbbfaddc31a909735c1e6',
         },
-        ciphertext: '5318b4d5bcd28de64ee5559e671353e16f075ecae9f99c7a79a38af5f869aa46',
+        ciphertext:
+          '5318b4d5bcd28de64ee5559e671353e16f075ecae9f99c7a79a38af5f869aa46',
         kdf: 'pbkdf2',
         kdfparams: {
           c: 262144,
           dklen: 32,
           prf: 'hmac-sha256',
-          salt: 'ae3cd4e7013836a3df6bd7241b12db061dbe2c6785853cce422d148a624ce0bd',
+          salt:
+            'ae3cd4e7013836a3df6bd7241b12db061dbe2c6785853cce422d148a624ce0bd',
         },
         mac: '517ead924a9d0dc3124507e3393d175ce3ff7c1e96529c6c555ce9e51205e9b2',
       },
@@ -122,19 +130,24 @@ const staticTests: { json: KeyStore; password: string; priv: string }[] = [
 
 describe('utils', () => {
   describe('encryption', () => {
-    staticTests.forEach(test => {
+    staticTests.forEach((test) => {
       it('encrypt staticTests and compare to keystore', async () => {
-        const keystore = await encrypt(Buffer.from(test.priv, 'hex'), Address.ZERO, test.password, {
-          id: test.json.id,
-          iv: test.json.crypto.cipherparams.iv,
-          kdf: test.json.crypto.kdf,
-          ...test.json.crypto.kdfparams,
-        });
+        const keystore = await encrypt(
+          Buffer.from(test.priv, 'hex'),
+          Address.ZERO,
+          test.password,
+          {
+            id: test.json.id,
+            iv: test.json.crypto.cipherparams.iv,
+            kdf: test.json.crypto.kdf,
+            ...test.json.crypto.kdfparams,
+          },
+        );
         expect(keystore).toEqual(test.json);
       }, 30000);
     });
 
-    staticTests.forEach(test => {
+    staticTests.forEach((test) => {
       it('decrypt staticTests and compare to private key', async () => {
         const privateKey = await decrypt(test.json, test.password);
         expect(privateKey).toEqual(Buffer.from(test.priv, 'hex'));

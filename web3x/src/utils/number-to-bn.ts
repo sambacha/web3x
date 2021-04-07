@@ -27,7 +27,9 @@ export function numberToBN(arg) {
     const formattedString = String(arg)
       .toLowerCase()
       .trim();
-    const isHexPrefixed = formattedString.substr(0, 2) === '0x' || formattedString.substr(0, 3) === '-0x';
+    const isHexPrefixed =
+      formattedString.substr(0, 2) === '0x' ||
+      formattedString.substr(0, 3) === '-0x';
     let stringArg = stripHexPrefix(formattedString); // eslint-disable-line
     if (stringArg.substr(0, 1) === '-') {
       stringArg = stripHexPrefix(stringArg.slice(1));
@@ -43,11 +45,17 @@ export function numberToBN(arg) {
       return new BN(stringArg, 16).mul(multiplier);
     }
 
-    if ((stringArg.match(/^-?[0-9]+$/) || stringArg === '') && isHexPrefixed === false) {
+    if (
+      (stringArg.match(/^-?[0-9]+$/) || stringArg === '') &&
+      isHexPrefixed === false
+    ) {
       return new BN(stringArg, 10).mul(multiplier);
     }
-  } else if (typeof arg === 'object' && arg.toString && (!arg.pop && !arg.push)) {
-    if (arg.toString(10).match(/^-?[0-9]+$/) && (arg.mul || arg.dividedToIntegerBy)) {
+  } else if (typeof arg === 'object' && arg.toString && !arg.pop && !arg.push) {
+    if (
+      arg.toString(10).match(/^-?[0-9]+$/) &&
+      (arg.mul || arg.dividedToIntegerBy)
+    ) {
       return new BN(arg.toString(10), 10);
     }
   }
