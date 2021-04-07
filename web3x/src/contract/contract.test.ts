@@ -1487,14 +1487,12 @@ describe('contract', () => {
 
       const contract = new TestContract(eth, address);
 
-      const gasUsed = await contract.methods
-        .mySend(address, 17)
-        .estimateGas({
-          from: address,
-          gas: 50000,
-          gasPrice: 3000,
-          value: 10000,
-        });
+      const gasUsed = await contract.methods.mySend(address, 17).estimateGas({
+        from: address,
+        gas: 50000,
+        gasPrice: 3000,
+        value: 10000,
+      });
 
       expect(gasUsed).toBe(16);
     });

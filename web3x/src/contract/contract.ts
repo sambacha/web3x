@@ -28,10 +28,14 @@ import {
 import { Subscription } from '../subscriptions';
 import { Data } from '../types';
 import { hexToBuffer } from '../utils';
-import { ContractAbi, ContractAbiDefinition, ContractEntry, ContractFunctionEntry} from './abi';
+import {
+  ContractAbi,
+  ContractAbiDefinition,
+  ContractEntry,
+  ContractFunctionEntry,
+} from './abi';
 import { Tx, TxFactory } from './tx';
 import { TxDeploy } from './tx-deploy';
-
 
 export interface ContractOptions {
   from?: Address;
@@ -40,9 +44,9 @@ export interface ContractOptions {
 }
 
 export interface ContractSettings extends ContractOptions {
-  address?: Address
-  jsonInterface: ContractAbiDefinition
-  data?: string
+  address?: Address;
+  jsonInterface: ContractAbiDefinition;
+  data?: string;
 }
 
 interface ContractDefinition {
@@ -322,12 +326,12 @@ export class Contract<T extends ContractDefinition | void = void> {
   }
 
   get options(): ContractSettings {
-    this.contractAbi.functions
+    this.contractAbi.functions;
     const abiEntries = ([] as ContractEntry[])
-        .concat(this.contractAbi.functions)
-        .concat(this.contractAbi.events)
-        .concat(this.contractAbi.ctor)
-        .map(item => item.entry);
+      .concat(this.contractAbi.functions)
+      .concat(this.contractAbi.events)
+      .concat(this.contractAbi.ctor)
+      .map((item) => item.entry);
 
     return {
       ...this.defaultOptions,
